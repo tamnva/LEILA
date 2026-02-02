@@ -1,4 +1,11 @@
-
+#' Show map of selected gauges
+#'
+#' @param stations_shape polygon object; GIS map of gauges
+#' @param select_gauge_id vector; selected station ids
+#' 
+#' @return leaflet map of selected gauging stations
+#'
+#' @export
 
 showGauge <- function(stations_shape, select_gauge_id){
   

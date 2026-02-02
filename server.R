@@ -65,7 +65,8 @@ function(input, output, session) {
       variable_name = c("discharge_spec_obs", "precipitation_mean"),
       start_date = input$selectPeriod[1],
       end_date = input$selectPeriod[2],
-      max_missing = input$maxQmissing)
+      max_missing = input$maxQmissing) %>%
+      mutate(across(where(is.numeric), function(x) round(x, 3)))
     
     hydrologische_indikatoren <<-  attributes %>% 
       dplyr::filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
@@ -129,7 +130,9 @@ function(input, output, session) {
   #    Select catchment based on streamflow data availability (Data)           #
   #----------------------------------------------------------------------------#
   observeEvent(input$selectFlowRegime, {
-    if (!is.null(hydrologische_indikatoren)){
+    
+    if (!("None" %in% input$selectFlowRegime) & 
+         !is.null(hydrologische_indikatoren)){
       
       update_hydrologische_indikatoren <<- hydrologische_indikatoren
       
@@ -138,9 +141,14 @@ function(input, output, session) {
         
         update_hydrologische_indikatoren <<- update_hydrologische_indikatoren %>%
           filter(!!sym(colname) > 1.1)
-        
-        message("colname = ", colname, " nstations = ", nrow(update_hydrologische_indikatoren))
       }
+      
+      showNotification(
+        paste0("Number of targeted catchments: ", 
+               nrow(update_hydrologische_indikatoren)),
+               type = "message", 
+               duration = 3
+        )
       
       # Display catchment attributes
       output$catchment_attributes <- DT::renderDataTable({
@@ -156,7 +164,24 @@ function(input, output, session) {
       
       # Update map
       showGauge(stations, update_hydrologische_indikatoren$gauge_id)
-    } 
+    } else if (("None" %in% input$selectFlowRegime) &
+               (!is.null(hydrologische_indikatoren))){
+      
+      # Display catchment attributes
+      output$catchment_attributes <- DT::renderDataTable({
+        showDataFrame(attributes, session, "catchment_attributes", 
+                      hydrologische_indikatoren$gauge_id)
+      })
+      
+      # Display hydrological indicators
+      output$hydrologische_indikatoren <- DT::renderDataTable({
+        showDataFrame(hydrologische_indikatoren, session, 
+                      "hydrologische_indikatoren")
+      })
+      
+      # Update map
+      showGauge(stations, hydrologische_indikatoren$gauge_id)
+    }
     
   })
   
