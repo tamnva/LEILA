@@ -192,8 +192,6 @@ function(input, output, session) {
                         choices = colnames(hydro_indicator %>% 
                                              select(!c(lat, long, gauge_id))))
     }
-
-    
     
   })
   
@@ -204,9 +202,10 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   observeEvent(input$runRegression, {
     
+    show_notification(input$runRegression)
+    
     dependent_var <- input$selectDepVar #c("Q_5")
     independent_var <- input$selectIndepVar[1] #c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
-    
     
     # Get data for regression
     regression_df <- hydro_indicator %>% 
