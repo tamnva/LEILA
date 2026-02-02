@@ -230,7 +230,7 @@ function(input, output, session) {
         labs(x = "Fitted values", y = "Actual values",
              title = paste0("Hydrological indicator: ", dependent_var))+
         theme_bw() +
-        theme(plot.title = element_text(size = 12),
+        theme(plot.title = element_text(size = 11),
               axis.title = element_text(size = 10),
               text = element_text(family = "Arial"))
     ))
