@@ -24,7 +24,7 @@ navbarPage(
         # Panel to display plots.
         absolutePanel(
           id = "controls", class = "panel panel-default", fixed = TRUE, 
-          draggable = FALSE, top = 64, left = "auto", right = 10, 
+          draggable = TRUE, top = 60, left = "auto", right = 20, 
           bottom = "auto", width = 450, height = "auto",
           
           bslib::navset_card_underline(
@@ -59,13 +59,12 @@ navbarPage(
               
               selectInput("selectFlowRegime", "1. Select flow regime",
                           multiple = TRUE, 
-                          choices = c("None",
-                                      "CVQ_Autumn > 1.1 (erratic)",
+                          choices = c("CVQ_Autumn > 1.1 (erratic)",
                                       "CVQ_Winter > 1.1 (erratic)",
                                       "CVQ_Spring > 1.1 (erratic)",
                                       "CVQ_Summer > 1.1 (erratic)"),
-                          selected = "None"),
-              
+                          selected = "CVQ_Summer > 1.1 (erratic)"
+              ),
               textInput("stream_wquality", 
                            "2. River length with good water quality (%)",
                            value = "No data available"),
@@ -83,31 +82,10 @@ navbarPage(
             
             # Regression to link hydrological indicator and catchment attributes
             bslib::nav_panel(
-              tags$style(HTML(".selectize-input {
-              max-height: 100px;   /* ~5 items */
-              overflow-y: auto;}")),
-              
               title = "3.Regression", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
-              selectInput("selectRegressionModel", "1. Select regression model",
-                          multiple = FALSE, 
-                          choices = c("Multiple Linear Regression",
-                                      "Random forest",
-                                      "Tableau Foundation"),
-                          selected = "Multiple Linear Regression"),
-              
-              selectInput("selectIndepVar", "2. Select independent variable(s)",
-                          multiple = TRUE, 
-                          choices = colnames(attributes)[-c(1)]),
-              
-              selectInput("selectDepVar", "3. Select dependent variable(s)",
-                          multiple = TRUE, 
-                          choices = c("var_1", "var_2"),
-                          selected = "var_1"),
-              
-              h5("4. Run regression model"),
-              actionButton("runRegression", "Run")
+              h6("working")
             ),
             
           ), 
