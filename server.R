@@ -225,12 +225,14 @@ function(input, output, session) {
     
     output$regression_plot <- plotly::renderPlotly(ggplotly(
       ggplot( ) + 
-        geom_point(aes(x = fitted, y = actual), alpha = 0.4, size = 0.5, 
+        geom_point(aes(x = fitted, y = actual), alpha = 0.4, size = 1, 
                    color = "#1E88E5")+
         labs(x = "Fitted values", y = "Actual values",
              title = paste0("Hydrological indicator: ", dependent_var))+
-        theme(text = element_text(size=2)) + 
-        theme_bw()
+        theme_bw() +
+        theme(plot.title = element_text(size = 12),
+              axis.title = element_text(size = 10),
+              text = element_text(family = "Arial"))
     ))
     
   })
