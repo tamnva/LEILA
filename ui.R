@@ -15,8 +15,7 @@ navbarPage(
         tags$head(
           # Include our custom CSS
           includeCSS("styles.css"),
-          includeScript("gomap.js"),
-          ),
+          includeScript("gomap.js")
         ),
         
         leafletOutput("map", width="100%", height="100%"),
