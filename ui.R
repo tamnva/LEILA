@@ -1,4 +1,5 @@
 library(leaflet)
+library(plotly)
 
 navbarPage(
   "", id="nav",

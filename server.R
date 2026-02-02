@@ -208,8 +208,8 @@ function(input, output, session) {
   observeEvent(input$runRegression, {
     
     # Currently this is for multi-linear regresssion model
-    dependent_var <- input$selectDepVar[1] #c("Q_5")
-    independent_var <- input$selectIndepVar #c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
+    dependent_var <- input$selectDepVar[1]  # c("Q_5")
+    independent_var <- input$selectIndepVar # c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
     
     # Get data for regression
     regression_df <- hydro_indicator %>% 
