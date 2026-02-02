@@ -195,17 +195,21 @@ function(input, output, session) {
     
   })
   
-  
+  #----------------------------------------------------------------------------#
+  #                        Message selecting regression method                 #
+  #----------------------------------------------------------------------------#
+  observeEvent(input$selectRegressionModel, {
+    show_notification(input$selectRegressionModel)
+  })
 
   #----------------------------------------------------------------------------#
   # Regression: linking hydrological indicators and catchment characteristics  #
   #----------------------------------------------------------------------------#
   observeEvent(input$runRegression, {
     
-    show_notification(input$runRegression)
-    
-    dependent_var <- input$selectDepVar #c("Q_5")
-    independent_var <- input$selectIndepVar[1] #c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
+    # Currently this is for multi-linear regresssion model
+    dependent_var <- input$selectDepVar[1] #c("Q_5")
+    independent_var <- input$selectIndepVar #c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
     
     # Get data for regression
     regression_df <- hydro_indicator %>% 
