@@ -23,7 +23,7 @@ navbarPage(
         # Panel to display plots.
         absolutePanel(
           id = "controls", class = "panel panel-default", fixed = TRUE, 
-          draggable = FALSE, top = 100, left = "auto", right = 20, 
+          draggable = FALSE, top = 65, left = "auto", right = 15, 
           bottom = "auto", width = 450, height = "auto",
           
           bslib::navset_card_underline(
@@ -75,9 +75,6 @@ navbarPage(
               
               h5("4. Add more criteria here..."),
               
-              h5("5. Select targeted catchments"),
-              actionButton("selectTargetedCatchments", "Run")
-              
             ),
             
             # Regression to link hydrological indicator and catchment attributes
@@ -98,11 +95,15 @@ navbarPage(
               
               selectInput("selectDepVar", "3. Select dependent variable(s)",
                           multiple = TRUE, 
-                          choices = c("var_1", "var_2"),
-                          selected = "var_1"),
+                          choices = NA,
+                          selected = NA),
               
               h5("4. Run regression model"),
-              actionButton("runRegression", "Run")
+              actionButton("runRegression", "Run", width = "70%"),
+              
+              h5(),
+              plotlyOutput("regression_plot", height = "300px", width = "350px")
+              
             ),
             
           ), 
@@ -119,6 +120,6 @@ navbarPage(
   tabPanel(
     "Hydrologische Indikatoren",
     hr(),
-    DT::dataTableOutput("hydrologische_indikatoren")
+    DT::dataTableOutput("hydro_indicator")
   )
 )

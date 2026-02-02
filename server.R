@@ -1,4 +1,4 @@
-
+library(plotly)
 
 function(input, output, session) {
 
@@ -59,38 +59,38 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   observeEvent(input$dataSubset, {
 
-    # Read streamflow data from CAMELS-DE
-    streamflow_statistic <<- getStreamflowStatistics(
-      timeseries_camels_combine = timeseries_camels_combine_file,
-      variable_name = c("discharge_spec_obs", "precipitation_mean"),
-      start_date = input$selectPeriod[1],
-      end_date = input$selectPeriod[2],
-      max_missing = input$maxQmissing) %>%
-      mutate(across(where(is.numeric), function(x) round(x, 3)))
+    #streamflow_statistic <<- getStreamflowStatistics(
+    #  timeseries_camels_combine = timeseries_camels_combine_file,
+    #  variable_name = c("discharge_spec_obs", "precipitation_mean"),
+    #  start_date = input$selectPeriod[1],
+    #  end_date = input$selectPeriod[2],
+    #  max_missing = input$maxQmissing) %>%
+    #  mutate(across(where(is.numeric), function(x) round(x, 3)))
     
-    hydrologische_indikatoren <<-  attributes %>% 
-      dplyr::filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
-      dplyr::select(lat, long, gauge_id) %>% 
-      dplyr::left_join(streamflow_statistic, by = "gauge_id")
+    #hydro_indicator <<-  attributes %>% 
+    #  dplyr::filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
+    #  dplyr::select(lat, long, gauge_id) %>% 
+    #  dplyr::left_join(streamflow_statistic, by = "gauge_id")
+    
+    hydro_indicator <<- readr::read_csv("data/hydro_indicator.csv",
+                                        show_col_types = FALSE)
     
     # Display hydrological indicators
-    output$hydrologische_indikatoren <- DT::renderDataTable({
-      showDataFrame(attributes, session, "hydrologische_indikatoren", 
-                    streamflow_statistic$gauge_id)
+    output$hydro_indicator <- DT::renderDataTable({
+      showDataFrame(attributes, session, "hydro_indicator", 
+                    hydro_indicator$gauge_id)
     })
     
     # Display catchment attributes
     output$catchment_attributes <- DT::renderDataTable({
       showDataFrame(attributes, session, "catchment_attributes", 
-                    streamflow_statistic$gauge_id)})
+                    hydro_indicator$gauge_id)})
     
     # Update map
-    showGauge(stations, streamflow_statistic$gauge_id)
+    showGauge(stations, hydro_indicator$gauge_id)
 
   })
   
-  
-
   #----------------------------------------------------------------------------#
   #                 Show catchment when click on table                         #
   #----------------------------------------------------------------------------#
@@ -132,20 +132,19 @@ function(input, output, session) {
   observeEvent(input$selectFlowRegime, {
     
     if (!("None" %in% input$selectFlowRegime) & 
-         !is.null(hydrologische_indikatoren)){
+         !is.null(hydro_indicator)){
       
-      update_hydrologische_indikatoren <<- hydrologische_indikatoren
+      update_hydro_indicator <- hydro_indicator
       
       for (condition in input$selectFlowRegime){
         colname <- strsplit(condition, " ")[[1]][1]
-        
-        update_hydrologische_indikatoren <<- update_hydrologische_indikatoren %>%
+        update_hydro_indicator <- update_hydro_indicator %>%
           filter(!!sym(colname) > 1.1)
       }
       
       showNotification(
         paste0("Number of targeted catchments: ", 
-               nrow(update_hydrologische_indikatoren)),
+               nrow(update_hydro_indicator)),
                type = "message", 
                duration = 3
         )
@@ -153,41 +152,90 @@ function(input, output, session) {
       # Display catchment attributes
       output$catchment_attributes <- DT::renderDataTable({
         showDataFrame(attributes, session, "catchment_attributes", 
-                      update_hydrologische_indikatoren$gauge_id)
+                      update_hydro_indicator$gauge_id)
       })
       
       # Display hydrological indicators
-      output$hydrologische_indikatoren <- DT::renderDataTable({
-        showDataFrame(update_hydrologische_indikatoren, session, 
-                      "hydrologische_indikatoren")
+      output$hydro_indicator <- DT::renderDataTable({
+        showDataFrame(update_hydro_indicator, session, 
+                      "hydro_indicator")
       })
       
       # Update map
-      showGauge(stations, update_hydrologische_indikatoren$gauge_id)
+      showGauge(stations, update_hydro_indicator$gauge_id)
+      
+      selected_catchment <<- update_hydro_indicator$gauge_id
+      
     } else if (("None" %in% input$selectFlowRegime) &
-               (!is.null(hydrologische_indikatoren))){
+               (!is.null(hydro_indicator))){
       
       # Display catchment attributes
       output$catchment_attributes <- DT::renderDataTable({
         showDataFrame(attributes, session, "catchment_attributes", 
-                      hydrologische_indikatoren$gauge_id)
+                      hydro_indicator$gauge_id)
       })
       
       # Display hydrological indicators
-      output$hydrologische_indikatoren <- DT::renderDataTable({
-        showDataFrame(hydrologische_indikatoren, session, 
-                      "hydrologische_indikatoren")
+      output$hydro_indicator <- DT::renderDataTable({
+        showDataFrame(hydro_indicator, session, 
+                      "hydro_indicator")
       })
       
       # Update map
-      showGauge(stations, hydrologische_indikatoren$gauge_id)
+      showGauge(stations, hydro_indicator$gauge_id)
     }
+    
+    # Update regression select dependent variables
+    if (!is.null(hydro_indicator)){
+      updateSelectInput(session,
+                        "selectDepVar", "3. Select dependent variable(s)",
+                        choices = colnames(hydro_indicator %>% 
+                                             select(!c(lat, long, gauge_id))))
+    }
+
+    
     
   })
   
   
+
+  #----------------------------------------------------------------------------#
+  # Regression: linking hydrological indicators and catchment characteristics  #
+  #----------------------------------------------------------------------------#
+  observeEvent(input$runRegression, {
+    
+    dependent_var <- input$selectDepVar #c("Q_5")
+    independent_var <- input$selectIndepVar[1] #c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
+    
+    
+    # Get data for regression
+    regression_df <- hydro_indicator %>% 
+      select(c(gauge_id, {{dependent_var}})) %>%
+      right_join(attributes %>% 
+                   select(c(gauge_id, {{independent_var}})) %>%
+                   filter(gauge_id %in% hydro_indicator$gauge_id),
+                 by = "gauge_id") %>%
+      drop_na()
+      
+    
+    model <- multiLinearReg(regression_df, dependent_var, independent_var)
+    
+    fitted <- model$fitted.values
+    actual <- regression_df[[dependent_var]]
+    
+    output$regression_plot <- plotly::renderPlotly(ggplotly(
+      ggplot( ) + 
+        geom_point(aes(x = fitted, y = actual), alpha = 0.4, size = 0.5, 
+                   color = "#1E88E5")+
+        labs(x = "Fitted values", y = "Actual values",
+             title = paste0("Hydrological indicator: ", dependent_var))+
+        theme(text = element_text(size=2)) + 
+        theme_bw()
+    ))
+    
+  })
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #
-  #----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------#    
   
 }

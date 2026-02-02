@@ -8,6 +8,8 @@ library(terra)
 library(tibble)
 library(DT)
 library(spsComps)
+library(ggplot2)
+
 
 
 # setwd("C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization")
@@ -29,7 +31,8 @@ stations <- sf::st_transform(st_read("data/CAMELS_DE_gauging_stations.shp",
 catchments <- sf::st_transform(st_read("data/CAMELS_DE_catchments.shp", 
                                        quiet = TRUE), 4326) 
 
-hydrologische_indikatoren <- NULL
+hydro_indicator <- NULL
+selected_catchment <- NULL
 
 #Read Hydrogeologische Einheiten (from huek250 map from BGR)
 huek <- rast("data/huek.tif")
