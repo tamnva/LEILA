@@ -103,7 +103,11 @@ navbarPage(
               actionButton("runRegression", "Run", width = "70%"),
               
               h5(),
-              plotlyOutput("regression_plot", height = "300px", width = "300px")
+              div(
+                style = "height: 300px; overflow-y: auto; 
+                border: 1px solid #ccc; padding: 0px;",
+                plotlyOutput("regression_plot", height = "300px", width = "300px"),
+              )
               
             ),
             

@@ -208,7 +208,7 @@ function(input, output, session) {
   observeEvent(input$runRegression, {
     
     # Currently this is for multi-linear regresssion model
-    dependent_var <- input$selectDepVar[1]  # c("Q_5")
+    dependent_var <- input$selectDepVar  # c("Q_5")
     independent_var <- input$selectIndepVar # c("p_mean", "p_seasonality", "frac_snow", "high_prec_freq")
     
     # Get data for regression
@@ -220,27 +220,21 @@ function(input, output, session) {
                  by = "gauge_id") %>%
       drop_na()
       
+    model <<- multiLinearReg(regression_df, dependent_var, independent_var)
     
-    model <- multiLinearReg(regression_df, dependent_var, independent_var)
-    
-    fitted <- model$fitted.values
-    actual <- regression_df[[dependent_var]]
-    
-    output$regression_plot <- plotly::renderPlotly(ggplotly(
-      ggplot( ) + 
-        geom_point(aes(x = fitted, y = actual), alpha = 0.4, size = 1, 
-                   color = "#1E88E5")+
-        labs(x = "Fitted values", y = "Actual values",
-             title = paste0("Hydrological indicator: ", dependent_var))+
-        theme_bw() +
-        theme(plot.title = element_text(size = 11),
-              axis.title = element_text(size = 10),
-              text = element_text(family = "Arial"))
-    ))
-    
+    output$regression_plot <- plotly::renderPlotly(
+      subplot(model$plt, nrows = length(model$plt), 
+              titleX = TRUE, titleY = TRUE) %>%
+        layout(height = 280*length(model$plt))
+      )
   })
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #
-  #----------------------------------------------------------------------------#    
+  #----------------------------------------------------------------------------#  
+  
+  
+  #----------------------------------------------------------------------------#
+  #    Select catchment based on streamflow data availability (Data)           #
+  #----------------------------------------------------------------------------#  
   
 }
