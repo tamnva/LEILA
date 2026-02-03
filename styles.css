@@ -28,6 +28,8 @@ h1, h2, h3, h4 { font-weight: 400; }
   opacity: 1;
   zoom: 0.9;
   transition: opacity 0ms 0s;
+  max-height: 87%;   /* REQUIRED */
+  overflow-y: auto;
 }
 #controls:hover {
   /* Fade in while hovering */

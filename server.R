@@ -13,7 +13,7 @@ function(input, output, session) {
   output$map <- renderLeaflet({
     leaflet() %>%
       addTiles(group = "OpenStreetMap") %>%
-      addScaleBar(position = "bottomright") %>%
+      addScaleBar(position = "bottomleft") %>%
       addRasterImage(huek, opacity = 0.7, group = "Hydrogeologie") %>%
       addProviderTiles(providers$CartoDB.PositronNoLabels,
                        group = "CartoDBPositronNolabel") %>%
@@ -59,21 +59,26 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   observeEvent(input$dataSubset, {
 
-    #streamflow_statistic <<- getStreamflowStatistics(
-    #  timeseries_camels_combine = timeseries_camels_combine_file,
-    #  variable_name = c("discharge_spec_obs", "precipitation_mean"),
-    #  start_date = input$selectPeriod[1],
-    #  end_date = input$selectPeriod[2],
-    #  max_missing = input$maxQmissing) %>%
-    #  mutate(across(where(is.numeric), function(x) round(x, 3)))
-    
-    #hydro_indicator <<-  attributes %>% 
-    #  dplyr::filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
-    #  dplyr::select(lat, long, gauge_id) %>% 
-    #  dplyr::left_join(streamflow_statistic, by = "gauge_id")
-    
-    hydro_indicator <<- readr::read_csv("data/hydro_indicator.csv",
-                                        show_col_types = FALSE)
+    # Replace the default hydrological indicator if settings are change
+    if ((input$selectPeriod[1] == as.Date("2001-01-01") &
+         input$selectPeriod[2] == as.Date("2020-12-31") &
+         input$maxQmissing == 5)){
+      hydro_indicator <<- readr::read_csv("data/hydro_indicator.csv",
+                                          show_col_types = FALSE)
+    } else {
+      streamflow_statistic <<- getStreamflowStatistics(
+        timeseries_camels_combine = timeseries_camels_combine_file,
+        variable_name = c("discharge_spec_obs", "precipitation_mean"),
+        start_date = input$selectPeriod[1],
+        end_date = input$selectPeriod[2],
+        max_missing = input$maxQmissing) %>%
+        mutate(across(where(is.numeric), function(x) round(x, 3)))
+      
+      hydro_indicator <<-  attributes %>% 
+        dplyr::filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
+        dplyr::select(lat, long, gauge_id) %>% 
+        dplyr::left_join(streamflow_statistic, by = "gauge_id")
+    }
     
     # Display hydrological indicators
     output$hydro_indicator <- DT::renderDataTable({
