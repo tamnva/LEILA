@@ -33,7 +33,7 @@ navbarPage(
             
             # First need to filter catchments with streamflow data
             bslib::nav_panel(
-              title = "1.Data", selected = TRUE,
+              title = "1.Data selection", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               dateRangeInput("selectPeriod", 
@@ -80,7 +80,7 @@ navbarPage(
             
             # Regression to link hydrological indicator and catchment attributes
             bslib::nav_panel(
-              title = "3.Regression", selected = TRUE,
+              title = "3.Regression model", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectRegressionModel", "1. Select regression model",
@@ -109,6 +109,16 @@ navbarPage(
                 plotlyOutput("regression_plot", height = "300px", width = "300px"),
               )
               
+            ),
+            
+            bslib::nav_panel(
+              title = "4.Target & Curent state", selected = TRUE,
+              tags$hr(class = "custom-line"), h5(),
+              
+              selectInput("selectHydro", "1. Select hydrological indicators",
+                          multiple = TRUE, 
+                          choices = NA,
+                          selected = NA),
             ),
             
           ), 
