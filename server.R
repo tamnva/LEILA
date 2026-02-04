@@ -81,10 +81,7 @@ function(input, output, session) {
     }
     
     # Display hydrological indicators
-    output$hydro_indicator <- DT::renderDataTable({
-      showDataFrame(attributes, session, "hydro_indicator", 
-                    hydro_indicator$gauge_id)
-    })
+    output$hydro_indicator <- DT::renderDataTable({hydro_indicator})
     
     # Display catchment attributes
     output$catchment_attributes <- DT::renderDataTable({
@@ -93,6 +90,15 @@ function(input, output, session) {
     
     # Update map
     showGauge(stations, hydro_indicator$gauge_id)
+    
+    
+    # Update regression select dependent variables
+    if (!is.null(hydro_indicator)){
+      updateSelectInput(session,
+                        "selectDepVar", "3. Select dependent variable(s)",
+                        choices = colnames(hydro_indicator %>% 
+                                             select(!c(lat, long, gauge_id))))
+    }
 
   })
   
