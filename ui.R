@@ -66,15 +66,19 @@ navbarPage(
                                       "CVQ_Summer > 1.1 (erratic)"),
                           selected = "None"),
               
+              textInput("neatNat", 
+                        "2. Near-natural criteria",
+                        value = "dams_num == 0; agricultural_areas_perc <= 10"),
+              
               textInput("stream_wquality", 
-                           "2. River length with good water quality (%)",
+                           "3. River length with good water quality (%)",
                            value = "No data available"),
               
               textInput("groundwater_quality", 
-                           "3. Aquifer area with good water quality (%)",
+                           "4. Aquifer area with good water quality (%)",
                            value = "No data available"),
               
-              h5("4. Add more criteria here..."),
+              h5("5. Add more criteria here..."),
               
             ),
             
