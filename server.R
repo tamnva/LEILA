@@ -75,22 +75,30 @@ function(input, output, session) {
         mutate(across(where(is.numeric), function(x) round(x, 3)))
       
       hydro_indicator <<-  attributes %>% 
-        dplyr::filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
-        dplyr::select(lat, long, gauge_id) %>% 
-        dplyr::left_join(streamflow_statistic, by = "gauge_id")
+        filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
+        select(lat, long, gauge_id) %>% 
+        left_join(streamflow_statistic, by = "gauge_id")
+      
+      #data.table::fwrite(hydro_indicator, "data/hydro_indicator.csv")
     }
     
-    # Display hydrological indicators
-    output$hydro_indicator <- DT::renderDataTable({hydro_indicator})
+    # Display catchment attributes (add precipitation mean and std to this table)
+    attributes <<- attributes %>% 
+      left_join(hydro_indicator %>% select(p_mean, p_std, gauge_id), 
+                       by = "gauge_id")
     
-    # Display catchment attributes
     output$catchment_attributes <- DT::renderDataTable({
       showDataFrame(attributes, session, "catchment_attributes", 
                     hydro_indicator$gauge_id)})
     
+    # Display hydrological indicators, remove precipitation mean and std
+    hydro_indicator <- hydro_indicator %>%
+      select(!c(p_mean, p_std)) 
+    
+    output$hydro_indicator <- DT::renderDataTable({hydro_indicator})
+    
     # Update map
     showGauge(stations, hydro_indicator$gauge_id)
-    
     
     # Update regression select dependent variables
     if (!is.null(hydro_indicator)){
@@ -99,6 +107,11 @@ function(input, output, session) {
                         choices = colnames(hydro_indicator %>% 
                                              select(!c(lat, long, gauge_id))))
     }
+    
+    # Update 
+    updateSelectInput(session, "selectIndepVar", 
+                      "2. Select independent variable(s)",
+                      choices = colnames(attributes %>% select(!c(gauge_id))))
 
   })
   

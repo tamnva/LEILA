@@ -60,10 +60,10 @@ navbarPage(
               selectInput("selectFlowRegime", "1. Select flow regime",
                           multiple = TRUE, 
                           choices = c("None",
-                                      "CVQ_Autumn > 1.1 (erratic)",
-                                      "CVQ_Winter > 1.1 (erratic)",
-                                      "CVQ_Spring > 1.1 (erratic)",
-                                      "CVQ_Summer > 1.1 (erratic)"),
+                                      "cvq_autumn > 1.1 (erratic)",
+                                      "cvq_winter > 1.1 (erratic)",
+                                      "cvq_spring > 1.1 (erratic)",
+                                      "cvq_summer > 1.1 (erratic)"),
                           selected = "None"),
               
               textInput("neatNat", 
@@ -96,7 +96,8 @@ navbarPage(
               
               selectInput("selectIndepVar", "2. Select independent variable(s)",
                           multiple = TRUE, 
-                          choices = colnames(attributes)[-c(1)]),
+                          choices = NA,
+                          selected = NA),
               
               selectInput("selectDepVar", "3. Select dependent variable(s)",
                           multiple = TRUE, 

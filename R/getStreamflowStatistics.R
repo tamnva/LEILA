@@ -48,14 +48,16 @@ getStreamflowStatistics <- function(timeseries_camels_combine,
     dplyr::filter(!gauge_id %in% missing$gauge_id)
 
   message("Calculating daily streamflow statistics...")
-  daily_Q_statistics <- streamflow_precipitation %>%
+  daily_q_statistics <- streamflow_precipitation %>%
     dplyr::group_by(gauge_id) %>%
-    dplyr::summarise(Q_mean = mean(discharge_spec_obs, na.rm = TRUE),
-                     Q_std = sd(discharge_spec_obs, na.rm = TRUE),
-                     Q_5 = quantile(discharge_spec_obs, 0.05, na.rm= TRUE),
-                     Q_95 = quantile(discharge_spec_obs, 0.95, na.rm= TRUE),
+    dplyr::summarise(q_mean = mean(discharge_spec_obs, na.rm = TRUE),
+                     q_std = sd(discharge_spec_obs, na.rm = TRUE),
+                     q_5 = quantile(discharge_spec_obs, 0.05, na.rm= TRUE),
+                     q_95 = quantile(discharge_spec_obs, 0.95, na.rm= TRUE),
                      runoff_coefficient = sum(discharge_spec_obs, na.rm = TRUE)/
                        sum(precipitation_mean, na.rm = TRUE),
+                     p_mean = mean(precipitation_mean, na.rm = TRUE),
+                     p_std = sd(precipitation_mean, na.rm = TRUE),
                      .groups = "drop")
   
   message("Calculatin CVQ by season...")
@@ -70,41 +72,41 @@ getStreamflowStatistics <- function(timeseries_camels_combine,
                   )) %>%
     dplyr::group_by(gauge_id, season) %>%
     dplyr::summarise(
-      CVQ = sd(discharge_spec_obs, na.rm = TRUE)/mean(
+      cvq = sd(discharge_spec_obs, na.rm = TRUE)/mean(
         discharge_spec_obs, na.rm = TRUE), .groups = "drop"
     ) %>% 
-    pivot_wider(names_from =season, values_from = CVQ, names_prefix = "CVQ_")
+    pivot_wider(names_from =season, values_from = CVQ, names_prefix = "CVq_")
   
   message("Calculating minimum 7day average flow in 10 years (Q7,10)...")   
-  Q_7_10 <- streamflow_precipitation %>%
+  q_7_10 <- streamflow_precipitation %>%
     dplyr::group_by(gauge_id) %>%
-    dplyr::mutate(Q_7 = data.table::frollmean(discharge_spec_obs, 
+    dplyr::mutate(q_7 = data.table::frollmean(discharge_spec_obs, 
                                                  n = 7, na.rm = FALSE),
                   year = lubridate::year(date)) %>%
     dplyr::group_by(gauge_id, year) %>%
-    dplyr::summarise(Q_7_10 = min(Q_7, na.rm = TRUE),
+    dplyr::summarise(q_7_10 = min(q_7, na.rm = TRUE),
                      .groups = "drop")
   
-  Q_7_10$Q_7_10[which(is.infinite(Q_7_10$Q_7_10))] <- NA
+  q_7_10$q_7_10[which(is.infinite(q_7_10$q_7_10))] <- NA
   
-  Q_7_10 <- Q_7_10 %>% 
+  q_7_10 <- q_7_10 %>% 
     group_by(gauge_id) %>% 
-    dplyr::summarise(Q_7_10 = quantile(Q_7_10, 10/nyears, na.rm = TRUE))
+    dplyr::summarise(q_7_10 = quantile(q_7_10, 10/nyears, na.rm = TRUE))
   
   message("Calculating seasonal amplitude...")
-  Q_seasonal_amplitude <- streamflow_precipitation %>%
+  q_seasonal_amplitude <- streamflow_precipitation %>%
     dplyr::mutate(month = lubridate::month(date),) %>%
     dplyr::group_by(gauge_id, month) %>%
-    dplyr::summarise(Q_monthly_mean = mean(discharge_spec_obs, na.rm = TRUE),
+    dplyr::summarise(q_monthly_mean = mean(discharge_spec_obs, na.rm = TRUE),
                      .groups = "drop") %>%
     dplyr::group_by(gauge_id) %>%
-    dplyr::summarise(Q_seasonal_amplitude = max(Q_monthly_mean, na.rm = TRUE) -
-                       min(Q_monthly_mean, na.rm = TRUE),
+    dplyr::summarise(q_seasonal_amplitude = max(q_monthly_mean, na.rm = TRUE) -
+                       min(q_monthly_mean, na.rm = TRUE),
                      .groups = "drop")
     
-  streamflow_statistics <- daily_Q_statistics %>%
-    dplyr::left_join(Q_7_10, by = "gauge_id")  %>%
-    dplyr::left_join(Q_seasonal_amplitude, by = "gauge_id") %>%
+  streamflow_statistics <- daily_q_statistics %>%
+    dplyr::left_join(q_7_10, by = "gauge_id")  %>%
+    dplyr::left_join(q_seasonal_amplitude, by = "gauge_id") %>%
     dplyr::left_join(CVQ, by = "gauge_id")
   
   message("Done")
