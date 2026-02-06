@@ -121,7 +121,7 @@ navbarPage(
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectHydro", "1. Select hydrological indicators",
-                          multiple = TRUE, 
+                          multiple = FALSE, 
                           choices = NA,
                           selected = NA),
             ),

@@ -246,8 +246,20 @@ function(input, output, session) {
       )
   })
   #----------------------------------------------------------------------------#
-  #    Select catchment based on streamflow data availability (Data)           #
+  #        Differences between current states and target indictors             #
   #----------------------------------------------------------------------------#  
+  observeEvent(input$selectDepVar, {
+    
+    updateSelectInput(session, "selectHydro", 
+                      "1. Select hydrological indicators",
+                      choices = input$selectDepVar,
+                      selected = input$selectDepVar[1])
+    
+  
+  })
+  
+  
+  
   
   
   #----------------------------------------------------------------------------#
