@@ -91,7 +91,7 @@ navbarPage(
                           multiple = FALSE, 
                           choices = c("Multiple Linear Regression",
                                       "Random forest",
-                                      "Tableau Foundation"),
+                                      "TabICLv2"),
                           selected = "Multiple Linear Regression"),
               
               selectInput("selectIndepVar", "2. Select independent variable(s)",

@@ -253,13 +253,11 @@ function(input, output, session) {
     updateSelectInput(session, "selectHydro", 
                       "1. Select hydrological indicators",
                       choices = input$selectDepVar,
-                      selected = input$selectDepVar[1])
+                      selected = NA)
     
+    print(input$selectDepVar)
   
   })
-  
-  
-  
   
   
   #----------------------------------------------------------------------------#
