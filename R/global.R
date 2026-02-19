@@ -21,21 +21,23 @@ timeseries_camels_combine_file = "data/CAMELS_DE_hydromet_timeseries_combine.csv
 
 # Read catchment attributes
 attributes <- read.csv("data/attributes.csv", header = TRUE, sep = ",") %>%
-  tibble::as_tibble() %>% 
+  as_tibble() %>% 
   rename(lat = gauge_lat, long = gauge_lon)
 
 # Read shape files of station and catchments
-stations <<- sf::st_transform(st_read("data/CAMELS_DE_gauging_stations.shp", 
+stations <<- st_transform(st_read("data/CAMELS_DE_gauging_stations.shp", 
                                      quiet = TRUE), 4326) %>%
-  dplyr::mutate(long = st_coordinates(geometry)[1],
+  mutate(long = st_coordinates(geometry)[1],
                 lat = st_coordinates(geometry)[2])
 
-catchments <<- sf::st_transform(st_read("data/CAMELS_DE_catchments.shp", 
+catchments <<- st_transform(st_read("data/CAMELS_DE_catchments.shp", 
                                        quiet = TRUE), 4326) 
+
+# https://www.geoportal.de/Download/bec888f9-ba0c-42dc-846e-177b8265dafa
+schutzgetbiet <- st_transform(st_read("data/schutzgebiet"), 4326)
 
 hydro_indicator <<- NULL
 selected_catchment <<- NULL
 
 #Read Hydrogeologische Einheiten (from huek250 map from BGR)
 huek <- rast("data/huek.tif")
-

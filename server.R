@@ -11,10 +11,13 @@ function(input, output, session) {
   #               Background + default maps/tables                             #
   #----------------------------------------------------------------------------#
   output$map <- renderLeaflet({
-    leaflet() %>%
+    leaflet(schutzgetbiet) %>%
       addTiles(group = "OpenStreetMap") %>%
       addScaleBar(position = "bottomleft") %>%
       addRasterImage(huek, opacity = 0.7, group = "Hydrogeologie") %>%
+      addPolygons(fillColor = "#006400", color = "#006400",
+                  fillOpacity = 0.6, stroke = TRUE, weight = 1,
+                  group = "Naturschutzgebiet") %>%
       addProviderTiles(providers$CartoDB.PositronNoLabels,
                        group = "CartoDBPositronNolabel") %>%
       addProviderTiles(providers$CartoDB.Positron,
@@ -36,13 +39,15 @@ function(input, output, session) {
         baseGroups = c("CartoDBPositron", "CartoDBPositronNolabel", 
                        "OpenStreetMap", "OpenTopoMap", "WorldImagery"),
         overlayGroups = c("Alle Einzugsgebiete",
-                          "Hydrogeologie", 
+                          "Hydrogeologie",
+                          "Naturschutzgebiet",
                           "Ökologischer Zustand der Fließgewässer",
                           "Grundwasserqualität",
                           "Grundwasser-Vulnerabilität"),
         options = layersControlOptions(position = "bottomleft")
       )  %>%
       hideGroup(c("Hydrogeologie", 
+                  "Naturschutzgebiet",
                   "Ökologischer Zustand der Fließgewässer",
                   "Grundwasserqualität",
                   "Grundwasser-Vulnerabilität")) %>%
@@ -255,7 +260,6 @@ function(input, output, session) {
                       choices = input$selectDepVar,
                       selected = NA)
     
-    print(input$selectDepVar)
   
   })
   

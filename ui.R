@@ -31,9 +31,9 @@ navbarPage(
             id = "navset",
             title = NULL,
             
-            # First need to filter catchments with streamflow data
+            # Select "targeted catchment"
             bslib::nav_panel(
-              title = "1.Data selection", selected = TRUE,
+              title = "1. Select catchments", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               dateRangeInput("selectPeriod", 
@@ -45,46 +45,42 @@ navbarPage(
               
               numericInput("maxQmissing", 
                            "2. Maximum allowable missing streamflow (%)",
-                           min = 0, max = 99, value = 5),
+                           min = 0, max = 99, value = 5, width = "85%"),
               
-              h5("3. Run subseting catchments"),
-              actionButton("dataSubset", 
-                           "Run and calculate streamflow statistics")
-            ),
-            
-            # Now select "targeted catchment"
-            bslib::nav_panel(
-              title = "2.Targeted catchments", selected = TRUE,
-              tags$hr(class = "custom-line"), h5(),
-              
-              selectInput("selectFlowRegime", "1. Select flow regime",
-                          multiple = TRUE, 
+              selectInput("selectFlowRegime", "3. Select flow regime",
+                          multiple = TRUE,
                           choices = c("None",
                                       "cvq_autumn > 1.1 (erratic)",
                                       "cvq_winter > 1.1 (erratic)",
                                       "cvq_spring > 1.1 (erratic)",
                                       "cvq_summer > 1.1 (erratic)"),
-                          selected = "None"),
+                          selected = "cvq_autumn > 1.1 (erratic)"),
               
               textInput("neatNat", 
-                        "2. Near-natural criteria",
+                        "4. Near-natural criteria",
                         value = "dams_num == 0; agricultural_areas_perc <= 10"),
               
               textInput("stream_wquality", 
-                           "3. River length with good water quality (%)",
+                           "5. River length with good water quality (%)",
                            value = "No data available"),
               
               textInput("groundwater_quality", 
-                           "4. Aquifer area with good water quality (%)",
+                           "6. Aquifer area with good water quality (%)",
                            value = "No data available"),
               
-              h5("5. Add more criteria here..."),
+              h5("7. Add more criteria here..."),
+              
+              h5("8. Run subseting catchments"),
+              
+              actionButton("dataSubset", 
+                           "Run and calculate streamflow statistics",
+                           width = "68%"),
               
             ),
             
             # Regression to link hydrological indicator and catchment attributes
             bslib::nav_panel(
-              title = "3.Regression model", selected = TRUE,
+              title = "2.Regression model", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectRegressionModel", "1. Select regression model",
@@ -105,7 +101,7 @@ navbarPage(
                           selected = NA),
               
               h5("4. Run regression model"),
-              actionButton("runRegression", "Run", width = "70%"),
+              actionButton("runRegression", "Run", width = "68%"),
               
               h5(),
               div(
@@ -117,7 +113,7 @@ navbarPage(
             ),
             
             bslib::nav_panel(
-              title = "4.Target & Curent state", selected = TRUE,
+              title = "3.Target & Curent state", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectHydro", "1. Select hydrological indicators",
