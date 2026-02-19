@@ -8,12 +8,12 @@
 #'
 #' @export
 
-library(dplyr)
-timeseries_camels_combine <- "C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization/data/CAMELS_DE_hydromet_timeseries_combine.csv"
-variable_name <- c("discharge_spec_obs", "precipitation_mean")
-start_date <- as.Date("2001-01-01")
-end_date <- as.Date("2020-12-31")
-max_missing <- 5
+#library(dplyr)
+#timeseries_camels_combine <- "C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization/data/CAMELS_DE_hydromet_timeseries_combine.csv"
+#variable_name <- c("discharge_spec_obs", "precipitation_mean")
+#start_date <- as.Date("2001-01-01")
+#end_date <- as.Date("2020-12-31")
+#max_missing <- 5
 #data.table::fwrite(streamflow_statistics, 
 #                   "C:/Users/nguyenta/Documents/LEILA/working_code_documentation/data/hydrological_indicators.csv")
 

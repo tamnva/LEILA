@@ -10,6 +10,7 @@ library(DT)
 library(spsComps)
 library(ggplot2)
 library(patchwork)
+library(trend)
 
 
 
