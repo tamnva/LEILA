@@ -78,7 +78,6 @@ navbarPage(
                            "3. Maximum agricultural land area (%)",
                            min = 0, max = 1, value = 0.1, width = "85%"),
               
-              
               numericInput("maxUrban", 
                            "4. Maximum urban land area (%)",
                            min = 0, max = 1, value = 0.05, width = "85%"),

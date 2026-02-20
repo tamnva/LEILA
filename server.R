@@ -170,14 +170,7 @@ function(input, output, session) {
         update_hydro_indicator <- update_hydro_indicator %>%
           filter(!!sym(colname) > 1.1)
       }
-      
-      showNotification(
-        paste0("Number of targeted catchments: ", 
-               nrow(update_hydro_indicator)),
-               type = "message", 
-               duration = 3
-        )
-      
+
       # Display catchment attributes
       output$catchment_attributes <- DT::renderDataTable({
         showDataFrame(attributes, session, "catchment_attributes", 
