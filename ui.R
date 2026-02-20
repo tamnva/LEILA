@@ -33,7 +33,7 @@ navbarPage(
             
             # Select "targeted catchment"
             bslib::nav_panel(
-              title = "1. Select catchments", selected = TRUE,
+              title = "1. Select period", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               dateRangeInput("selectPeriod", 
@@ -47,7 +47,21 @@ navbarPage(
                            "2. Maximum allowable missing streamflow (%)",
                            min = 0, max = 99, value = 5, width = "85%"),
               
-              selectInput("selectFlowRegime", "3. Select flow regime",
+              h5("3. Run subseting catchments"),
+              
+              actionButton("dataSubset", 
+                           "Select & derive streamflow statistics",
+                           width = "68%"),
+            ),
+            
+            # Select "targeted catchment"
+            bslib::nav_panel(
+              title = "2. Select basin", selected = TRUE,
+              tags$hr(class = "custom-line"), h5(),
+              
+             
+              
+              selectInput("selectFlowRegime", "1. Select flow regime",
                           multiple = TRUE,
                           choices = c("None",
                                       "cvq_autumn > 1.1 (erratic)",
@@ -56,9 +70,18 @@ navbarPage(
                                       "cvq_summer > 1.1 (erratic)"),
                           selected = "cvq_autumn > 1.1 (erratic)"),
               
-              textInput("neatNat", 
-                        "4. Near-natural criteria",
-                        value = "dams_num == 0; agricultural_areas_perc <= 10"),
+              numericInput("maxNrDams", 
+                           "2. Maximum number of dams",
+                           min = 0, max = 99, value = 0, width = "85%"),
+              
+              numericInput("maxAgri", 
+                           "3. Maximum agricultural land area (%)",
+                           min = 0, max = 1, value = 0.1, width = "85%"),
+              
+              
+              numericInput("maxUrban", 
+                           "4. Maximum urban land area (%)",
+                           min = 0, max = 1, value = 0.05, width = "85%"),
               
               textInput("stream_wquality", 
                            "5. River length with good water quality (%)",
@@ -69,18 +92,13 @@ navbarPage(
                            value = "No data available"),
               
               h5("7. Add more criteria here..."),
-              
-              h5("8. Run subseting catchments"),
-              
-              actionButton("dataSubset", 
-                           "Run and calculate streamflow statistics",
-                           width = "68%"),
+            
               
             ),
             
             # Regression to link hydrological indicator and catchment attributes
             bslib::nav_panel(
-              title = "2.Regression model", selected = TRUE,
+              title = "3.Regression", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectRegressionModel", "1. Select regression model",
@@ -113,7 +131,7 @@ navbarPage(
             ),
             
             bslib::nav_panel(
-              title = "3.Target & Curent state", selected = TRUE,
+              title = "4.State", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectHydro", "1. Select hydrological indicators",

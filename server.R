@@ -158,7 +158,7 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #
   #----------------------------------------------------------------------------#
-  observeEvent(c(input$selectFlowRegime, input$neatNat), {
+  observeEvent(c(input$selectFlowRegime), {
     
     if (!("None" %in% input$selectFlowRegime) & 
          !is.null(hydro_indicator)){
