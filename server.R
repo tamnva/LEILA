@@ -11,13 +11,16 @@ function(input, output, session) {
   #               Background + default maps/tables                             #
   #----------------------------------------------------------------------------#
   output$map <- renderLeaflet({
-    leaflet(schutzgetbiet) %>%
+    leaflet() %>%
       addTiles(group = "OpenStreetMap") %>%
       addScaleBar(position = "bottomleft") %>%
       addRasterImage(huek, opacity = 0.7, group = "Hydrogeologie") %>%
-      addPolygons(fillColor = "#006400", color = "#006400",
-                  fillOpacity = 0.6, stroke = TRUE, weight = 1,
-                  group = "Naturschutzgebiet") %>%
+      addPolygons(data = schutzgetbiet, fillColor = "#006400", 
+                  color = "#006400", fillOpacity = 0.6, stroke = TRUE, 
+                  weight = 1, group = "Naturschutzgebiet") %>%
+      addPolygons(data = nitratbelastete_gebiete, fillColor = "#DC3220", 
+                  color = "#DC3220", fillOpacity = 0.6, stroke = TRUE, 
+                  weight = 1, group = "Nitratbelastete Gebiete") %>%
       addProviderTiles(providers$CartoDB.PositronNoLabels,
                        group = "CartoDBPositronNolabel") %>%
       addProviderTiles(providers$CartoDB.Positron,
@@ -41,19 +44,15 @@ function(input, output, session) {
         overlayGroups = c("Alle Einzugsgebiete",
                           "Hydrogeologie",
                           "Naturschutzgebiet",
-                          "Ökologischer Zustand der Fließgewässer",
-                          "Grundwasserqualität",
-                          "Grundwasser-Vulnerabilität"),
+                          "Nitratbelastete Gebiete"),
         options = layersControlOptions(position = "bottomleft")
       )  %>%
       hideGroup(c("Hydrogeologie", 
                   "Naturschutzgebiet",
-                  "Ökologischer Zustand der Fließgewässer",
-                  "Grundwasserqualität",
-                  "Grundwasser-Vulnerabilität")) %>%
+                  "Nitratbelastete Gebiete")) %>%
       setView(lng = 9, lat = 50, zoom = 5)
   })
-  
+    
   
   output$catchment_attributes <- DT::renderDataTable({
     showDataFrame(attributes, session, "catchment_attributes", NULL)

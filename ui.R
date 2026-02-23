@@ -72,15 +72,15 @@ navbarPage(
               
               numericInput("maxNrDams", 
                            "2. Maximum number of dams",
-                           min = 0, max = 99, value = 0, width = "85%"),
+                           min = 0, max = 50, value = 50, width = "85%"),
               
               numericInput("maxAgri", 
                            "3. Maximum agricultural land area (%)",
-                           min = 0, max = 1, value = 100, width = "85%"),
+                           min = 0, max = 100, value = 100, width = "85%"),
               
               numericInput("maxUrban", 
                            "4. Maximum urban land area (%)",
-                           min = 0, max = 1, value = 100, width = "85%"),
+                           min = 0, max = 100, value = 100, width = "85%"),
               
               numericInput("annualQTrend", 
                            "5. No Q trend (max |sen's slope|)",
