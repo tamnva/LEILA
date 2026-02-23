@@ -161,7 +161,8 @@ function(input, output, session) {
   observeEvent(c(input$selectFlowRegime,
                  input$maxAgri,
                  input$maxNrDams,
-                 input$maxUrban), {
+                 input$maxUrban,
+                 input$annualQTrend), {
                    
     if (!is.null(hydro_indicator)){
       
@@ -195,6 +196,14 @@ function(input, output, session) {
       selected_gauge_id <- intersect(
         selected_gauge_id, 
         attributes$gauge_id[which(attributes$dams_num <= input$maxNrDams)]
+      )
+      
+      
+      # Select basins with sen's slope within a given range
+      selected_gauge_id <- intersect(
+        selected_gauge_id, 
+        hydro_indicator$gauge_id[which(
+          abs(hydro_indicator$q_annual_sens_slope) <= input$annualQTrend)]
       )
       
       # Update map of selected stations

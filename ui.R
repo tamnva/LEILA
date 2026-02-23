@@ -76,18 +76,22 @@ navbarPage(
               
               numericInput("maxAgri", 
                            "3. Maximum agricultural land area (%)",
-                           min = 0, max = 1, value = 20, width = "85%"),
+                           min = 0, max = 1, value = 100, width = "85%"),
               
               numericInput("maxUrban", 
                            "4. Maximum urban land area (%)",
-                           min = 0, max = 1, value = 5, width = "85%"),
+                           min = 0, max = 1, value = 100, width = "85%"),
+              
+              numericInput("annualQTrend", 
+                           "5. No Q trend (max |sen's slope|)",
+                           min = 0.001, max = 0.1, value = 0.1, width = "85%"),
               
               textInput("stream_wquality", 
-                           "5. River length with good water quality (%)",
+                           "6. River length with good water quality (%)",
                            value = "No data available"),
               
               textInput("groundwater_quality", 
-                           "6. Aquifer area with good water quality (%)",
+                           "7. Aquifer area with good water quality (%)",
                            value = "No data available"),
               
               h5("7. Add more criteria here..."),
