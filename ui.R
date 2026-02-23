@@ -68,7 +68,7 @@ navbarPage(
                                       "cvq_winter > 1.1 (erratic)",
                                       "cvq_spring > 1.1 (erratic)",
                                       "cvq_summer > 1.1 (erratic)"),
-                          selected = "cvq_autumn > 1.1 (erratic)"),
+                          selected = "None"),
               
               numericInput("maxNrDams", 
                            "2. Maximum number of dams",
@@ -76,7 +76,7 @@ navbarPage(
               
               numericInput("maxAgri", 
                            "3. Maximum agricultural land area (%)",
-                           min = 0, max = 1, value = 10, width = "85%"),
+                           min = 0, max = 1, value = 20, width = "85%"),
               
               numericInput("maxUrban", 
                            "4. Maximum urban land area (%)",
