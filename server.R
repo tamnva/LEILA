@@ -160,7 +160,8 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   observeEvent(c(input$selectFlowRegime,
                  input$maxAgri,
-                 input$maxNrDams), {
+                 input$maxNrDams,
+                 input$maxUrban), {
                    
     if (!is.null(hydro_indicator)){
       
@@ -176,12 +177,19 @@ function(input, output, session) {
         selected_gauge_id <<- intersect(selected_gauge_id, temp$gauge_id)
       }
       
-      # Select basins from maximum agricultural fraction
+      # Select basins from maximum agricultural area
       selected_gauge_id <<- intersect(
         selected_gauge_id, 
         attributes$gauge_id[which(attributes$agricultural_areas_perc 
                                   <= input$maxAgri)]
         )
+      
+      # Select basins from maximum urban area 
+      selected_gauge_id <<- intersect(
+        selected_gauge_id, 
+        attributes$gauge_id[which(attributes$artificial_surfaces_perc 
+                                  <= input$maxUrban)]
+      )
       
       # Select basins from number of dams
       selected_gauge_id <- intersect(
