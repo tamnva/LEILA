@@ -76,11 +76,11 @@ navbarPage(
               
               numericInput("maxAgri", 
                            "3. Maximum agricultural land area (%)",
-                           min = 0, max = 1, value = 0.1, width = "85%"),
+                           min = 0, max = 1, value = 10, width = "85%"),
               
               numericInput("maxUrban", 
                            "4. Maximum urban land area (%)",
-                           min = 0, max = 1, value = 0.05, width = "85%"),
+                           min = 0, max = 1, value = 5, width = "85%"),
               
               textInput("stream_wquality", 
                            "5. River length with good water quality (%)",

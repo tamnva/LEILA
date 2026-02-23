@@ -158,8 +158,11 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #
   #----------------------------------------------------------------------------#
-  observeEvent(c(input$selectFlowRegime), {
+  observeEvent(c(input$selectFlowRegime,
+                 input$maxAgri), {
     
+    # Selected basins from flow regime
+                   
     if (!("None" %in% input$selectFlowRegime) & 
          !is.null(hydro_indicator)){
       
