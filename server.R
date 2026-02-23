@@ -7,6 +7,18 @@ function(input, output, session) {
     shiny::stopApp()
   })
   
+  # Add the nitrate polluted areas into the attributes
+  attributes <<- attributes %>% 
+    left_join(overlappingArea(catchments, nitratbelastete_gebiete) %>%
+                rename(nitrate_polluted_area_fraction = percent_cover), 
+              by = "gauge_id")
+  
+  # Add the nitrate polluted areas into the attributes
+  attributes <<- attributes %>% 
+    left_join(overlappingArea(catchments, schutzgetbiet) %>%
+                rename(protected_area_fraction = percent_cover), 
+              by = "gauge_id")
+  
   #----------------------------------------------------------------------------#
   #               Background + default maps/tables                             #
   #----------------------------------------------------------------------------#
@@ -219,7 +231,7 @@ function(input, output, session) {
       selected_gauge_id <- intersect(
         selected_gauge_id, 
         attributes$gauge_id[which(
-          attributes$protected_area_fraction <= input$protectedArea
+          attributes$protected_area_fraction >= input$protectedArea
         )]
       )
       

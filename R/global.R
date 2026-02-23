@@ -42,19 +42,6 @@ schutzgetbiet <- st_transform(st_read("data/schutzgebiet"), 4326)
 # https://metadaten.uba.de/smartfinder-client/?lang=de#/datasets/iso/07e1b760-397c-403c-8dc0-441c25b7195e
 nitratbelastete_gebiete <- st_transform(
   st_read("data/Nitratbelastete_Gebiete.geojson", quiet = TRUE), 4326) 
-
-
-# Add the nitrate polluted areas into the attributes
-attributes <- attributes %>% 
-  left_join(overlappingArea(catchments, nitratbelastete_gebiete) %>%
-              rename(nitrate_polluted_area_fraction = percent_cover), 
-            by = "gauge_id")
-
-# Add the nitrate polluted areas into the attributes
-attributes <- attributes %>% 
-  left_join(overlappingArea(catchments, schutzgetbiet) %>%
-              rename(protected_area_fraction = percent_cover), 
-            by = "gauge_id")
   
 hydro_indicator <- NULL
 
