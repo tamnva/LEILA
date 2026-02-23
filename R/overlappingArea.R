@@ -30,8 +30,7 @@ overlappingArea <- function(polygons, cover_polygons){
       total_int_area = ifelse(is.na(total_int_area), 0, total_int_area),
       percent_cover = as.numeric(total_int_area / int_area) * 100
     ) %>%
-    select(gauge_id, percent_cover) %>%
-    rename(nitrate_polluted_area_fraction = percent_cover)
+    select(gauge_id, percent_cover) 
   
   return(result)
   
