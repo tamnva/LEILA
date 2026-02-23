@@ -162,7 +162,8 @@ function(input, output, session) {
                  input$maxNrDams,
                  input$maxUrban,
                  input$annualQTrend,
-                 input$nirtatePollutedArea), {
+                 input$nirtatePollutedArea,
+                 input$protectedArea), {
                    
     if (!is.null(hydro_indicator)){
       
@@ -213,6 +214,15 @@ function(input, output, session) {
           attributes$nitrate_polluted_area_fraction <= input$nirtatePollutedArea
           )]
       )
+
+      # Select basins with nitrate polluted area smaller than certain values
+      selected_gauge_id <- intersect(
+        selected_gauge_id, 
+        attributes$gauge_id[which(
+          attributes$protected_area_fraction <= input$protectedArea
+        )]
+      )
+      
       
       # Update map of selected stations
       showGauge(stations, selected_gauge_id)

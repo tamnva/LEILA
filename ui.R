@@ -90,11 +90,15 @@ navbarPage(
                            "6. Maxium nitrate polluted area (%)",
                            min = 0, max = 100, value = 25, width = "85%"),
               
+              numericInput("protectedArea", 
+                           "7. Minimum nature protected area (%)",
+                           min = 0, max = 100, value = 0, width = "85%"),
+              
               textInput("groundwater_quality", 
-                           "7. Aquifer area with good water quality (%)",
+                           "8. Aquifer area with good water quality (%)",
                            value = "No data available"),
               
-              h5("8. Add more criteria here..."),
+              h5("9. Add more criteria here..."),
               
             ),
             
