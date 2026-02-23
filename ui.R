@@ -86,16 +86,15 @@ navbarPage(
                            "5. No Q trend (max |sen's slope|)",
                            min = 0.001, max = 0.1, value = 0.1, width = "85%"),
               
-              textInput("stream_wquality", 
-                           "6. River length with good water quality (%)",
-                           value = "No data available"),
+              numericInput("nirtatePollutedArea", 
+                           "6. Maxium nitrate polluted area (%)",
+                           min = 0, max = 100, value = 25, width = "85%"),
               
               textInput("groundwater_quality", 
                            "7. Aquifer area with good water quality (%)",
                            value = "No data available"),
               
-              h5("7. Add more criteria here..."),
-            
+              h5("8. Add more criteria here..."),
               
             ),
             

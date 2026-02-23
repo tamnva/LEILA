@@ -21,7 +21,7 @@ library(trend)
 timeseries_camels_combine_file = "data/CAMELS_DE_hydromet_timeseries_combine.csv"
 
 # Read catchment attributes
-attributes <- read.csv("data/attributes.csv", header = TRUE, sep = ",") %>%
+attributes <<- read.csv("data/attributes.csv", header = TRUE, sep = ",") %>%
   as_tibble() %>% 
   rename(lat = gauge_lat, long = gauge_lon)
 
@@ -34,15 +34,23 @@ stations <<- st_transform(st_read("data/CAMELS_DE_gauging_stations.shp",
 catchments <<- st_transform(st_read("data/CAMELS_DE_catchments.shp", 
                                        quiet = TRUE), 4326) 
 
-# Schutzgebiete: https://www.geoportal.de/Download/bec888f9-ba0c-42dc-846e-177b8265dafa
-schutzgetbiet <- st_transform(st_read("data/schutzgebiet"), 4326)
+# Schutzgebiete: 
+# https://www.geoportal.de/Download/bec888f9-ba0c-42dc-846e-177b8265dafa
+schutzgetbiet <<- st_transform(st_read("data/schutzgebiet"), 4326)
 
-# Nitratbelastete Gebiete https://metadaten.uba.de/smartfinder-client/?lang=de#/datasets/iso/07e1b760-397c-403c-8dc0-441c25b7195e
+# Nitratbelastete Gebiete 
+# https://metadaten.uba.de/smartfinder-client/?lang=de#/datasets/iso/07e1b760-397c-403c-8dc0-441c25b7195e
 nitratbelastete_gebiete <- st_transform(
   st_read("data/Nitratbelastete_Gebiete.geojson", quiet = TRUE), 4326) 
 
-hydro_indicator <<- NULL
-selected_catchment <<- NULL
 
-#Read Hydrogeologische Einheiten (from huek250 map from BGR)
+# Add the nitrate polluted areas into the attributes
+attributes <<- attributes %>% 
+  left_join(overlappingArea(catchments, nitratbelastete_gebiete), 
+            by = "gauge_id")
+  
+hydro_indicator <<- NULL
+
+# Read Hydrogeologische Einheiten (from huek250 map from BGR)
+# https://www.bgr.bund.de/DE/Themen/Grundwasser/Projekte/Flaechen-Rauminformationen/Huek250/huek250.html
 huek <- rast("data/huek.tif")
