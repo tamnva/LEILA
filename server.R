@@ -97,7 +97,7 @@ function(input, output, session) {
                     hydro_indicator$gauge_id)})
     
     # Display hydrological indicators, remove precipitation mean and std
-    hydro_indicator <- hydro_indicator %>%
+    hydro_indicator <<- hydro_indicator %>%
       select(!c(p_mean, p_std)) 
     
     output$hydro_indicator <- DT::renderDataTable({hydro_indicator})
@@ -159,64 +159,60 @@ function(input, output, session) {
   #    Select catchment based on streamflow data availability (Data)           #
   #----------------------------------------------------------------------------#
   observeEvent(c(input$selectFlowRegime,
-                 input$maxAgri), {
-    
-    # Selected basins from flow regime
+                 input$maxAgri,
+                 input$maxNrDams), {
                    
-    if (!("None" %in% input$selectFlowRegime) & 
-         !is.null(hydro_indicator)){
-      
-      update_hydro_indicator <- hydro_indicator
-      
-      for (condition in input$selectFlowRegime){
-        colname <- strsplit(condition, " ")[[1]][1]
-        update_hydro_indicator <- update_hydro_indicator %>%
-          filter(!!sym(colname) > 1.1)
-      }
-
-      # Display catchment attributes
-      output$catchment_attributes <- DT::renderDataTable({
-        showDataFrame(attributes, session, "catchment_attributes", 
-                      update_hydro_indicator$gauge_id)
-      })
-      
-      # Display hydrological indicators
-      output$hydro_indicator <- DT::renderDataTable({
-        showDataFrame(update_hydro_indicator, session, 
-                      "hydro_indicator")
-      })
-      
-      # Update map
-      showGauge(stations, update_hydro_indicator$gauge_id)
-      
-      selected_catchment <<- update_hydro_indicator$gauge_id
-      
-    } else if (("None" %in% input$selectFlowRegime) &
-               (!is.null(hydro_indicator))){
-      
-      # Display catchment attributes
-      output$catchment_attributes <- DT::renderDataTable({
-        showDataFrame(attributes, session, "catchment_attributes", 
-                      hydro_indicator$gauge_id)
-      })
-      
-      # Display hydrological indicators
-      output$hydro_indicator <- DT::renderDataTable({
-        showDataFrame(hydro_indicator, session, 
-                      "hydro_indicator")
-      })
-      
-      # Update map
-      showGauge(stations, hydro_indicator$gauge_id)
-    }
-    
-    # Update regression select dependent variables
     if (!is.null(hydro_indicator)){
-      updateSelectInput(session,
-                        "selectDepVar", "3. Select dependent variable(s)",
-                        choices = colnames(hydro_indicator %>% 
-                                             select(!c(lat, long, gauge_id))))
+      
+      selected_gauge_id <<- hydro_indicator$gauge_id
+      
+      # Selected basins from flow regime
+      if (!"None" %in% input$selectFlowRegime){
+        temp <- hydro_indicator
+        for (condition in input$selectFlowRegime){
+          colname <- strsplit(condition, " ")[[1]][1]
+          temp <- temp %>% filter(!!sym(colname) > 1.1)
+        }
+        selected_gauge_id <<- intersect(selected_gauge_id, temp$gauge_id)
+      }
+      
+      # Select basins from maximum agricultural fraction
+      selected_gauge_id <<- intersect(
+        selected_gauge_id, 
+        attributes$gauge_id[which(attributes$agricultural_areas_perc 
+                                  <= input$maxAgri)]
+        )
+      
+      # Select basins from number of dams
+      selected_gauge_id <- intersect(
+        selected_gauge_id, 
+        attributes$gauge_id[which(attributes$dams_num <= input$maxNrDams)]
+      )
+      
+      # Update map of selected stations
+      showGauge(stations, selected_gauge_id)
+      
+      # Update catchment attribute taböe
+      output$catchment_attributes <- DT::renderDataTable({
+        showDataFrame(attributes, session, "catchment_attributes", 
+                      selected_gauge_id)
+      })
+      
+      # Update hydrological indicator talbe
+      output$hydro_indicator <- DT::renderDataTable({
+        showDataFrame(hydro_indicator %>% 
+                        filter(gauge_id %in% selected_gauge_id), 
+                      session,  "hydro_indicator")
+        })
+        
     }
+                   
+                   
+
+                   
+                   
+    
+
     
   })
   
@@ -231,10 +227,11 @@ function(input, output, session) {
     
     # Get data for regression
     regression_df <- hydro_indicator %>% 
+      filter(gauge_id %in% selected_gauge_id) %>%
       select(c(gauge_id, {{dependent_var}})) %>%
       right_join(attributes %>% 
                    select(c(gauge_id, {{independent_var}})) %>%
-                   filter(gauge_id %in% hydro_indicator$gauge_id),
+                   filter(gauge_id %in% selected_gauge_id),
                  by = "gauge_id") %>%
       drop_na()
       
