@@ -119,7 +119,7 @@ function(input, output, session) {
     # Update regression select dependent variables
     if (!is.null(hydro_indicator)){
       updateSelectInput(session,
-                        "selectDepVar", "3. Select dependent variable(s)",
+                        "selectDepVar", 
                         choices = colnames(hydro_indicator %>% 
                                              select(!c(lat, long, gauge_id))))
     }
@@ -211,7 +211,6 @@ function(input, output, session) {
         attributes$gauge_id[which(attributes$dams_num <= input$maxNrDams)]
       )
       
-      
       # Select basins with sen's slope within a given range
       selected_gauge_id <- intersect(
         selected_gauge_id, 
@@ -294,11 +293,11 @@ function(input, output, session) {
   #        Differences between current states and target indictors             #
   #----------------------------------------------------------------------------#  
   observeEvent(input$selectDepVar, {
-    
+
     updateSelectInput(session, "selectHydro", 
                       "1. Select hydrological indicators",
                       choices = input$selectDepVar,
-                      selected = NA)
+                      selected = input$selectDepVar[1])
     
   
   })

@@ -87,7 +87,7 @@ navbarPage(
                            min = 0.001, max = 0.1, value = 0.1, width = "85%"),
               
               numericInput("nirtatePollutedArea", 
-                           "6. Maxium nitrate polluted area (%)",
+                           "6. Maxium GW nitrate polluted area (%)",
                            min = 0, max = 100, value = 25, width = "85%"),
               
               numericInput("protectedArea", 
@@ -132,8 +132,10 @@ navbarPage(
                 style = "height: 300px; overflow-y: auto; 
                 border: 1px solid #ccc; padding: 0px;",
                 plotlyOutput("regression_plot", height = "300px", width = "300px"),
-              )
+              ),
               
+              h5("5. Calcualte near-nat. states for all catchments"),
+              actionButton("test", "Calculate", width = "68%"),
             ),
             
             bslib::nav_panel(
@@ -144,6 +146,11 @@ navbarPage(
                           multiple = FALSE, 
                           choices = NA,
                           selected = NA),
+              
+              h5("2. Visualize distance to near-nat. state"),
+              actionButton("test", "Calculate", width = "68%"),
+              
+              
             ),
             
           ), 
