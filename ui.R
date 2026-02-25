@@ -142,14 +142,13 @@ navbarPage(
               title = "4.State", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
-              selectInput("selectHydro", "1. Select hydrological indicators",
+              selectInput("selectHydro", "1. Select hydrological indicator",
                           multiple = FALSE, 
                           choices = NA,
                           selected = NA),
               
-              h5("2. Visualize distance to near-nat. state"),
+              h5("2. Visualize setting"),
               actionButton("test", "Calculate", width = "68%"),
-              
               
             ),
             
