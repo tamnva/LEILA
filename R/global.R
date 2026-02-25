@@ -13,20 +13,22 @@ library(patchwork)
 library(trend)
 
 # setwd("C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization")
+# Initialize some variales
+hydro_indicator <<- NULL
+near_nat_states <<- NULL
 
 # Time series data
 timeseries_camels_combine_file = "data/CAMELS_DE_hydromet_timeseries_combine.csv"
 
 # Read catchment attributes, stations, catchments
-attributes <- read_csv("data/attributes.csv", show_col_types = FALSE) 
-stations <- st_read("data/CAMELS_DE_gauging_stations.shp", quiet = TRUE)
-catchments <- st_read("data/CAMELS_DE_catchments.shp", quiet = TRUE)
-hydro_indicator <- NULL
+attributes <<- read_csv("data/attributes.csv", show_col_types = FALSE) 
+stations <<- st_read("data/CAMELS_DE_gauging_stations.shp", quiet = TRUE)
+catchments <<- st_read("data/CAMELS_DE_catchments.shp", quiet = TRUE)
 
 # Schutzgebiete, Nitratbelastete Gebiete, Hydrogeologische Einheiten
-schutzgetbiet <- st_transform(st_read("data/schutzgebiet"), 4326)
-nitratbelastete_gebiete <- st_read("data/Nitratbelastete_Gebiete.shp", quiet = TRUE)
-huek <- rast("data/huek.tif")
+schutzgetbiet <<- st_transform(st_read("data/schutzgebiet"), 4326)
+nitratbelastete_gebiete <<- st_read("data/Nitratbelastete_Gebiete.shp", quiet = TRUE)
+huek <<- rast("data/huek.tif")
 
 # Add the nitrate polluted and protected areas into the attributes
 # Run this when you replace the new nitratbelastete_gebiete and schutzgetbiet maps

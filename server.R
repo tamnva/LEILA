@@ -279,22 +279,31 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   observeEvent(input$calculate_near_nat, {
     
-    if (!(input$selectRegressionModel == "Multiple Linear Regression") &
-        !is.null(hydro_indicator) & FALSE){
+    if ((input$selectRegressionModel == "Multiple Linear Regression") &
+        !is.null(hydro_indicator)){
       
       # Get the data frame of independent variables
-      near_nat_states <- attributes %>% 
+      near_nat_states <<- attributes %>% 
         filter(gauge_id %in% hydro_indicator$gauge_id) %>%
-        select(c(gauge_id, {{input$selectIndepVar}})) %>%
+        select(c(gauge_id, input$selectIndepVar))
       
       for (var in input$selectDepVar){
-        near_nat_states[[var]] <- as.numeric(
+        near_nat_states[[paste0(var, "_near_nat")]] <- as.numeric(
           predict(model[[var]], near_nat_states)
           )
       }
       
-      print(near_nat_states)
+      # Combine with current state
+      near_nat_states <<- near_nat_states %>%
+        left_join(hydro_indicator %>% 
+                    select(c(gauge_id, input$selectDepVar)),
+                  by = "gauge_id")
       
+      # Calculate the differences between near natural and current states
+      for (var in input$selectDepVar){
+        near_nat_states[[paste0(var, "_diff")]] <- 
+          near_nat_states[[paste0(var, "_near_nat")]] - near_nat_states[[var]]
+      }
     }
     
     
