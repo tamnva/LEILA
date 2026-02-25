@@ -40,3 +40,4 @@ multiLinearReg <- function(data, dependent_var, independent_var){
   
   return(step_model)
 }
+

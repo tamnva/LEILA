@@ -135,7 +135,7 @@ navbarPage(
               ),
               
               h5("5. Calcualte near-nat. states for all catchments"),
-              actionButton("test", "Calculate", width = "68%"),
+              actionButton("calculate_near_nat", "Calculate", width = "68%"),
             ),
             
             bslib::nav_panel(
