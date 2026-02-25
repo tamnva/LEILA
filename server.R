@@ -284,8 +284,8 @@ function(input, output, session) {
       
       # Get the data frame of independent variables
       near_nat_states <- attributes %>% 
-        select({{input$selectIndepVar}}) %>%
-        filter(gauge_id %in% hydro_indicator$gauge_id)
+        filter(gauge_id %in% hydro_indicator$gauge_id) %>%
+        select(c(gauge_id, {{input$selectIndepVar}})) %>%
       
       for (var in input$selectDepVar){
         near_nat_states[[var]] <- as.numeric(

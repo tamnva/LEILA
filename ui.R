@@ -95,7 +95,7 @@ navbarPage(
                            min = 0, max = 100, value = 0, width = "85%"),
               
               textInput("groundwater_quality", 
-                           "8. Aquifer area with good water quality (%)",
+                           "8. Minimum river segment with good quality (%)",
                            value = "No data available"),
               
               h5("9. Add more criteria here..."),
