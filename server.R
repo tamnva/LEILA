@@ -316,8 +316,8 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   #              Calculate near natural states of all catchments               #
   #----------------------------------------------------------------------------#
-  #observeEvent(input$calculate_near_nat, {
-  #})
+  observeEvent(input$selectDiff, {
+  })
   
   
 

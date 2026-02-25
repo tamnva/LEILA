@@ -147,12 +147,15 @@ navbarPage(
                           choices = NA,
                           selected = NA),
               
-              selectInput("select_diff", "2. Select basins",
-                          multiple = TRUE,
+              selectInput("selectDiff", "2. Select basins",
+                          multiple = FALSE,
                           choices = c("All",
                                       "Near natural basins",
                                       "Non near-natural basin"),
                           selected = "All"),
+              
+              h5("   "),
+              h5("3....")
               
             ),
             
