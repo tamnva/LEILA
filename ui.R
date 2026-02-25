@@ -147,8 +147,12 @@ navbarPage(
                           choices = NA,
                           selected = NA),
               
-              h5("2. Visualize setting"),
-              actionButton("test", "Calculate", width = "68%"),
+              selectInput("select_diff", "2. Select basins",
+                          multiple = TRUE,
+                          choices = c("All",
+                                      "Near natural basins",
+                                      "Non near-natural basin"),
+                          selected = "All"),
               
             ),
             

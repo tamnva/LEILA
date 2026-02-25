@@ -300,8 +300,6 @@ function(input, output, session) {
                     select(c(gauge_id, input$selectDepVar)),
                   by = "gauge_id")
 
-      
-      
       # Calculate the differences between near natural and current states
       for (var in input$selectDepVar){ #c("q_mean","q_std")){ #input$selectDepVar){
         near_nat_states <<- near_nat_states %>%
@@ -314,10 +312,15 @@ function(input, output, session) {
     
   })
   
+
+  #----------------------------------------------------------------------------#
+  #              Calculate near natural states of all catchments               #
+  #----------------------------------------------------------------------------#
+  #observeEvent(input$calculate_near_nat, {
+  #})
   
   
-  
-  
+
   
   
   #----------------------------------------------------------------------------#
