@@ -283,10 +283,11 @@ function(input, output, session) {
         !is.null(hydro_indicator)){
       
       # Get the data frame of independent variables
-      near_nat_states <<- attributes %>% 
+      near_nat_states <- attributes %>% 
         filter(gauge_id %in% hydro_indicator$gauge_id) %>%
         select(c(gauge_id, input$selectIndepVar))
       
+      # Get the near natural state using regression equation
       for (var in input$selectDepVar){
         near_nat_states[[paste0(var, "_near_nat")]] <- as.numeric(
           predict(model[[var]], near_nat_states)
@@ -294,19 +295,22 @@ function(input, output, session) {
       }
       
       # Combine with current state
-      near_nat_states <<- near_nat_states %>%
+      near_nat_states <- near_nat_states %>%
         left_join(hydro_indicator %>% 
                     select(c(gauge_id, input$selectDepVar)),
                   by = "gauge_id")
+
+      
       
       # Calculate the differences between near natural and current states
-      for (var in input$selectDepVar){
-        near_nat_states[[paste0(var, "_diff")]] <- 
-          near_nat_states[[paste0(var, "_near_nat")]] - near_nat_states[[var]]
+      for (var in input$selectDepVar){ #c("q_mean","q_std")){ #input$selectDepVar){
+        near_nat_states <<- near_nat_states %>%
+          mutate(!!paste0(var, "_diff") := !!sym(paste0(var, "_near_nat")) - 
+                   !!sym(var))
       }
+      
+      print(near_nat_states)
     }
-    
-    
     
   })
   
@@ -323,8 +327,9 @@ function(input, output, session) {
 
     updateSelectInput(session, "selectHydro", 
                       "1. Select hydrological indicators",
-                      choices = input$selectDepVar,
-                      selected = input$selectDepVar[1])
+                      choices = paste0(input$selectDepVar, "_near_nat - ",
+                                       input$selectDepVar),
+                      selected = NA)
     
   
   })
