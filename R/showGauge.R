@@ -45,15 +45,12 @@ showGauge <- function(stations_shape,
                        layerId = ~ gauge_id
       ) %>%
       clearControls() %>%
-      addLegendNumeric(
+      addLegend(
         pal = pal,
         values = color_values,
         position = 'topleft',
         title = "Legend",
-        orientation = 'vertical',
-        decreasing = TRUE,
-        height = 120,
-        width = 15
+        opacity = 1
       ) 
   }
 }
