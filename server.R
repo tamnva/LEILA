@@ -345,24 +345,7 @@ function(input, output, session) {
       show_gauge_id <- new_stations$gauge_id
     }
     
-    showGauge(new_stations, show_gauge_id, 
-              colorby = variable,
-              legend_title = input$selectDiff)
-      
-    
-    # Update catchment attribute taböe
-#    output$catchment_attributes <- DT::renderDataTable({
-#      showDataFrame(attributes, session, "catchment_attributes", 
-#                    selected_gauge_id)
-#    })
-    
-    # Update hydrological indicator talbe
- #   output$hydro_indicator <- DT::renderDataTable({
- #     showDataFrame(hydro_indicator %>% 
- #                     filter(gauge_id %in% selected_gauge_id), 
- #                   session,  "hydro_indicator")
- #   })
-    
+    showGauge(new_stations, show_gauge_id, colorby = variable)
     
   }, ignoreInit = TRUE)
 
