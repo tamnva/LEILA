@@ -142,12 +142,12 @@ navbarPage(
               title = "4.State", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
-              selectInput("selectHydro", "1. Select hydrological indicator",
+              selectInput("selectDiff", "1. Select hydrological indicator",
                           multiple = FALSE, 
                           choices = NA,
                           selected = NA),
               
-              selectInput("selectDiff", "2. Select basins",
+              selectInput("selectBasinGroup", "2. Select basins",
                           multiple = FALSE,
                           choices = c("All",
                                       "Near natural basins",

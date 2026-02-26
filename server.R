@@ -118,12 +118,12 @@ function(input, output, session) {
     updateSelectInput(session, "selectIndepVar", 
                       "2. Select independent variable(s)",
                       choices = colnames(attributes %>% select(!c(gauge_id))))
-  })
+  }, ignoreInit = TRUE)
   
   #----------------------------------------------------------------------------#
   #                 Show catchment when click on table                         #
   #----------------------------------------------------------------------------#
-  observe({
+  observeEvent(input$goto, {
     if (is.null(input$goto))
       return()
     isolate({
@@ -135,7 +135,7 @@ function(input, output, session) {
       lng <- input$goto$lng
       map %>% fitBounds(lng - dist, lat - dist, lng + dist, lat + dist)
     })
-  })
+  }, ignoreInit = TRUE)
   
   #----------------------------------------------------------------------------#
   #                 Add catchment shape file when click on gauge               #
@@ -153,7 +153,7 @@ function(input, output, session) {
           popup = ~ showPopup(gauge_id),
           group = "Gewägktes Einzugsgebiet",
           layerId = ~ gauge_id)}
-  })
+  }, ignoreInit = TRUE)
   
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #
@@ -244,7 +244,7 @@ function(input, output, session) {
         
       }
       
-    })
+    }, ignoreInit = TRUE)
   
   #----------------------------------------------------------------------------#
   # Regression: linking hydrological indicators and catchment characteristics  #
@@ -272,7 +272,7 @@ function(input, output, session) {
               titleX = TRUE, titleY = TRUE) %>%
         layout(height = 280*length(model$plt))
       )
-  })
+  }, ignoreInit = TRUE)
   
   #----------------------------------------------------------------------------#
   #              Calculate near natural states of all catchments               #
@@ -308,21 +308,37 @@ function(input, output, session) {
       }
     }
     
-  })
+  }, ignoreInit = TRUE)
   
-
+  #----------------------------------------------------------------------------#
+  #        Differences between current states and target indictors             #
+  #----------------------------------------------------------------------------#  
+  observeEvent(input$selectDepVar, {
+    updateSelectInput(session, "selectDiff", 
+                      "1. Select hydrological indicators",
+                      choices = paste0(input$selectDepVar, "_near_nat - ",
+                                       input$selectDepVar),
+                      selected = NA)
+  }, ignoreInit = TRUE)
+  
   #----------------------------------------------------------------------------#
   #              Calculate near natural states of all catchments               #
   #----------------------------------------------------------------------------#
-  observe({
-    req(input$selectDiff)  
-    
-    print("ok")
-    
+  observeEvent(input$selectDiff, {
+
+    # Get variables name
+    print(input$selectDiff)
+    variable <- strsplit(input$selectDiff, split = " - ")[[1]][2]
     # Update map of selected stations
     # showGauge(stations, selected_gauge_id)
-    message(length(near_nat_states$gauge_id), "   ", length(selected_gauge_id))
+    # message(length(near_nat_states$gauge_id), "   ", length(selected_gauge_id))
     
+    showGauge(stations %>% 
+                left_join(near_nat_states, by = "gauge_id"), 
+              near_nat_states$gauge_id, 
+              colorby = variable,
+              legend_title = input$selectDiff[1])
+      
     
     # Update catchment attribute taböe
 #    output$catchment_attributes <- DT::renderDataTable({
@@ -338,25 +354,8 @@ function(input, output, session) {
  #   })
     
     
-  })
-  
+  }, ignoreInit = TRUE)
 
-  
-  
-  #----------------------------------------------------------------------------#
-  #        Differences between current states and target indictors             #
-  #----------------------------------------------------------------------------#  
-  observeEvent(input$selectDepVar, {
-
-    updateSelectInput(session, "selectHydro", 
-                      "1. Select hydrological indicators",
-                      choices = paste0(input$selectDepVar, "_near_nat - ",
-                                       input$selectDepVar),
-                      selected = NA)
-    
-  
-  })
-  
   
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #
