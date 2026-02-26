@@ -335,7 +335,7 @@ function(input, output, session) {
       filter(gauge_id %in% hydro_indicator$gauge_id) %>%
       left_join(near_nat_states, by = "gauge_id")
     
-    data.table::fwrite(near_nat_states, "C:/Users/nguyenta/Documents/neat_nat.csv")
+    #data.table::fwrite(near_nat_states, "C:/Users/nguyenta/Documents/neat_nat.csv")
     
     if (input$selectBasinGroup == "Near natural basins"){
       show_gauge_id <- selected_gauge_id
