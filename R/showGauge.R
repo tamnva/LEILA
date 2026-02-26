@@ -15,8 +15,7 @@ showGauge <- function(stations_shape,
   stations_shape <- stations_shape %>% 
     dplyr::filter(gauge_id %in% select_gauge_id)
   
-  if (!is.na(colorby)) color_values <- stations_shape[[colorby]] 
-  if (!is.na(legend_title)) legend_title = "Legend"
+  if (is.na(legend_title)) legend_title = "Legend"
   
   # Update map
   if (is.na(colorby)){
@@ -33,8 +32,11 @@ showGauge <- function(stations_shape,
       clearControls()
     
   } else {
+    
+    color_values <- stations_shape[[colorby]] 
     pal <- colorNumeric(palette = "viridis", 
-                        domain = color_values)
+                        domain = color_value,
+                        reverse = TRUE)
     
     leafletProxy("map") %>%
       clearGroup("Alle Einzugsgebiete") %>%
@@ -50,7 +52,8 @@ showGauge <- function(stations_shape,
       addLegend("topleft", 
                 pal = pal, 
                 values = color_values,
-                title = legend_title)
+                title = legend_title,
+                decreasing = TRUE)
     
     
   }
