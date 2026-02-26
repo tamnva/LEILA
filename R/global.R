@@ -1,4 +1,5 @@
 library(leaflet)
+library(leaflegend)
 library(dplyr)
 library(tidyr)
 library(readr)

@@ -40,15 +40,20 @@ showGauge <- function(stations_shape,
                        radius = 3,
                        group = "Alle Einzugsgebiete",
                        fillColor = pal(color_values),
-                       fillOpacity = 1,
                        stroke = FALSE,
+                       fillOpacity = 1,
                        layerId = ~ gauge_id
       ) %>%
       clearControls() %>%
-      addLegend(position = "topleft", 
-                pal = pal, 
-                values = color_values,
-                title = "Legend")
+      addLegendNumeric(
+        pal = pal,
+        values = color_values,
+        position = 'topleft',
+        title = "Legend",
+        orientation = 'vertical',
+        decreasing = TRUE,
+        height = 120,
+        width = 15
+      ) 
   }
 }
-
