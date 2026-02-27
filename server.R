@@ -354,6 +354,7 @@ function(input, output, session) {
     variable <- paste0(strsplit(input$selectDiff, split = " - ")[[1]][2], 
                        "_diff")
 
+    
     new_stations <- stations %>% 
       filter(gauge_id %in% hydro_indicator$gauge_id) %>%
       left_join(near_nat_states, by = "gauge_id")
