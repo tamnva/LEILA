@@ -222,7 +222,7 @@ function(input, output, session) {
         )
         
         # Select basins from number of dams
-        selected_gauge_id <- intersect(
+        selected_gauge_id <<- intersect(
           selected_gauge_id, 
           attributes$gauge_id[which(attributes$dams_num <= input$maxNrDams)]
         )
@@ -235,7 +235,7 @@ function(input, output, session) {
         )
         
         # Select basins with nitrate polluted area smaller than certain values
-        selected_gauge_id <- intersect(
+        selected_gauge_id <<- intersect(
           selected_gauge_id, 
           attributes$gauge_id[which(
             attributes$nitrate_polluted_area_fraction <= input$nirtatePollutedArea
@@ -243,7 +243,7 @@ function(input, output, session) {
         )
         
         # Select basins with nitrate polluted area smaller than certain values
-        selected_gauge_id <- intersect(
+        selected_gauge_id <<- intersect(
           selected_gauge_id, 
           attributes$gauge_id[which(
             attributes$protected_area_fraction >= input$protectedArea
