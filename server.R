@@ -31,25 +31,47 @@ function(input, output, session) {
                        group = "WorldImagery") %>%
       addCircleMarkers(data = stations,
                        radius = 3,
-                       group = "Alle Einzugsgebiete",
+                       group = "Abflussmessstelle",
                        fillColor = "#FFC107",
                        fillOpacity = 0.8,
                        stroke = FALSE,
                        popup = ~ showPopup(gauge_id),
                        layerId = ~ gauge_id
       ) %>%
+      addCircleMarkers(data = gw_wells,
+                       radius = 3,
+                       group = "Grundwassermessstelle",
+                       fillColor = "#2798F5",
+                       fillOpacity = 0.8,
+                       stroke = FALSE,
+                       popup = ~ UFZ.ID,
+                       layerId = ~ UFZ.ID
+      ) %>%
+      addPolygons(
+        data = subset(catchments),
+        stroke = TRUE,
+        fillColor = "#00000000",
+        color = "#DEDEDE",
+        weight = 1,
+        popup = ~ showPopup(gauge_id),
+        group = "Einzugsgebiete",
+        layerId = ~ gauge_id) %>%
       addLayersControl(
         baseGroups = c("CartoDBPositron", "CartoDBPositronNolabel", 
                        "OpenStreetMap", "OpenTopoMap", "WorldImagery"),
-        overlayGroups = c("Alle Einzugsgebiete",
+        overlayGroups = c("Abflussmessstelle", 
+                          "Einzugsgebiete",
                           "Hydrogeologie",
                           "Naturschutzgebiet",
-                          "Nitratbelastete Gebiete"),
+                          "Nitratbelastete Gebiete",
+                          "Grundwassermessstelle"),
         options = layersControlOptions(position = "bottomleft")
       )  %>%
       hideGroup(c("Hydrogeologie", 
                   "Naturschutzgebiet",
-                  "Nitratbelastete Gebiete")) %>%
+                  "Nitratbelastete Gebiete",
+                  "Grundwassermessstelle",
+                  "Einzugsgebiete")) %>%
       setView(lng = 9, lat = 50, zoom = 5)
   })
     
@@ -144,18 +166,19 @@ function(input, output, session) {
   #                 Add catchment shape file when click on gauge               #
   #----------------------------------------------------------------------------#
   observeEvent(input$map_marker_click, {
-    
     if (!is.null(input$map_marker_click$id)){
-      leafletProxy("map") %>%
-        clearGroup("Gewägktes Einzugsgebiet") %>%
-        addPolygons(
-          data = subset(catchments, gauge_id == input$map_marker_click$id),
-          stroke = TRUE,
-          fillColor = "#00000000",
-          weight = 2,
-          popup = ~ showPopup(gauge_id),
-          group = "Gewägktes Einzugsgebiet",
-          layerId = ~ gauge_id)}
+      if (input$map_marker_click$id %in% catchments$gauge_id){
+        leafletProxy("map") %>%
+          clearGroup("Gewägktes Einzugsgebiet") %>%
+          addPolygons(
+            data = subset(catchments, gauge_id == input$map_marker_click$id),
+            stroke = TRUE,
+            fillColor = "#00000000",
+            weight = 2,
+            popup = ~ showPopup(gauge_id),
+            group = "Gewägktes Einzugsgebiet",
+            layerId = ~ gauge_id)}
+      }
   }, ignoreInit = TRUE)
   
   #----------------------------------------------------------------------------#

@@ -30,6 +30,14 @@ schutzgetbiet <- st_transform(st_read("data/schutzgebiet"), 4326)
 nitratbelastete_gebiete <<- st_read("data/Nitratbelastete_Gebiete.shp", quiet = TRUE)
 huek <- rast("data/huek.tif")
 
+# Read groundwater wells
+gw_wells <- read.csv("data/gw_meta_monthly_geo_qc.txt", sep = ";", header = TRUE) %>%
+  as_tibble()
+gw_wells <- st_as_sf(gw_wells, coords = c("x_EPSG25832", "y_EPSG25832"), 
+                     crs = 25832, remove = FALSE)
+gw_wells <- st_transform(gw_wells, 4326)
+
+
 # Add the nitrate polluted and protected areas into the attributes
 # Run this when you replace the new nitratbelastete_gebiete and schutzgetbiet maps
 if (FALSE){
