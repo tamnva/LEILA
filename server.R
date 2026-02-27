@@ -51,7 +51,7 @@ function(input, output, session) {
         data = subset(catchments),
         stroke = TRUE,
         fillColor = "#00000000",
-        color = "#DEDEDE",
+        color = "#C4C4C4",
         weight = 1,
         popup = ~ showPopup(gauge_id),
         group = "Einzugsgebiete",
