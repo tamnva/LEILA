@@ -39,10 +39,10 @@ function(input, output, session) {
                        layerId = ~ gauge_id
       ) %>%
       addCircleMarkers(data = gw_wells,
-                       radius = 3,
+                       radius = 2,
                        group = "Grundwassermessstelle",
                        fillColor = "#2798F5",
-                       fillOpacity = 0.8,
+                       fillOpacity = 0.7,
                        stroke = FALSE,
                        popup = ~ UFZ.ID,
                        layerId = ~ UFZ.ID
