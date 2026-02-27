@@ -110,9 +110,6 @@ function(input, output, session) {
       #data.table::fwrite(hydro_indicator, "data/hydro_indicator.csv")
     }
     
-    # Selected gauge id
-    selected_gauge_id <<- hydro_indicator$gauge_id
-    
     # Display catchment attributes (add precipitation mean and std to this table)
     attributes <<- attributes %>% 
       left_join(hydro_indicator %>% select(p_mean, p_std, gauge_id), 
@@ -194,8 +191,12 @@ function(input, output, session) {
       input$protectedArea), 
     {
       
+      
       if (!is.null(hydro_indicator)){
 
+        # Selected gauge id
+        selected_gauge_id <<- hydro_indicator$gauge_id
+        
         # Selected basins from flow regime
         if (!"None" %in% input$selectFlowRegime){
           temp <- hydro_indicator
@@ -351,27 +352,28 @@ function(input, output, session) {
   observeEvent(c(input$selectDiff, input$selectBasinGroup), {
     
     # Get variables name
-    variable <- paste0(strsplit(input$selectDiff, split = " - ")[[1]][2], 
-                       "_diff")
+    if (!is.null(near_nat_states)){
+      variable <- paste0(strsplit(input$selectDiff, split = " - ")[[1]][2], 
+                         "_diff")
+      
+      new_stations <- stations %>% 
+        filter(gauge_id %in% hydro_indicator$gauge_id) %>%
+        left_join(near_nat_states, by = "gauge_id")
 
-    
-    new_stations <- stations %>% 
-      filter(gauge_id %in% hydro_indicator$gauge_id) %>%
-      left_join(near_nat_states, by = "gauge_id")
-    
-    #data.table::fwrite(near_nat_states, "C:/Users/nguyenta/Documents/neat_nat.csv")
-    
-    if (input$selectBasinGroup == "Near natural basins"){
-      show_gauge_id <- selected_gauge_id
-    } else if(input$selectBasinGroup == "Non near-natural basin") {
-      show_gauge_id <- setdiff(hydro_indicator$gauge_id, selected_gauge_id)
-    } else {
-      show_gauge_id <- new_stations$gauge_id
-    }
-    
-    showGauge(new_stations, show_gauge_id, colorby = variable)
-    
-  }, ignoreInit = TRUE)
+      
+      if (input$selectBasinGroup == "Near natural basins"){
+        show_gauge_id <- selected_gauge_id
+      } else if(input$selectBasinGroup == "Non near-natural basin") {
+        show_gauge_id <- setdiff(hydro_indicator$gauge_id, selected_gauge_id)
+      } else {
+        show_gauge_id <- new_stations$gauge_id
+      }
+      
+      showGauge(new_stations, show_gauge_id, colorby = variable)
+      } 
+    }, ignoreInit = TRUE)
+   
+
 
   
   #----------------------------------------------------------------------------#
