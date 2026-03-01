@@ -52,6 +52,8 @@ navbarPage(
               actionButton("dataSubset", 
                            "Select & derive streamflow statistics",
                            width = "68%"),
+              h5(),
+              h5("4. Derive other hydrological indicators..."),
             ),
             
             # Select "targeted catchment"
