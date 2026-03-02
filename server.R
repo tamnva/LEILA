@@ -195,7 +195,7 @@ function(input, output, session) {
       if (!is.null(hydro_indicator)){
 
         # Selected gauge id
-        selected_gauge_id <<- hydro_indicator$gauge_id
+        selected <- hydro_indicator$gauge_id
         
         # Selected basins from flow regime
         if (!"None" %in% input$selectFlowRegime){
@@ -204,69 +204,79 @@ function(input, output, session) {
             colname <- strsplit(condition, " ")[[1]][1]
             temp <- temp %>% filter(!!sym(colname) > 1.1)
           }
-          selected_gauge_id <<- intersect(selected_gauge_id, temp$gauge_id)
+          selected <- intersect(selected, temp$gauge_id)
         }
         
         # Select basins from maximum agricultural area
-        selected_gauge_id <<- intersect(
-          selected_gauge_id, 
+        selected <- intersect(
+          selected, 
           attributes$gauge_id[which(attributes$agricultural_areas_perc 
                                     <= input$maxAgri)]
         )
         
         # Select basins from maximum urban area 
-        selected_gauge_id <<- intersect(
-          selected_gauge_id, 
+        selected <- intersect(
+          selected, 
           attributes$gauge_id[which(attributes$artificial_surfaces_perc 
                                     <= input$maxUrban)]
         )
         
         # Select basins from number of dams
-        selected_gauge_id <<- intersect(
-          selected_gauge_id, 
+        selected <- intersect(
+          selected, 
           attributes$gauge_id[which(attributes$dams_num <= input$maxNrDams)]
         )
         
         # Select basins with sen's slope within a given range
-        selected_gauge_id <- intersect(
-          selected_gauge_id, 
+        selected <- intersect(
+          selected, 
           hydro_indicator$gauge_id[which(
             abs(hydro_indicator$q_annual_sens_slope) <= input$annualQTrend)]
         )
         
         # Select basins with nitrate polluted area smaller than certain values
-        selected_gauge_id <<- intersect(
-          selected_gauge_id, 
+        selected <- intersect(
+          selected, 
           attributes$gauge_id[which(
             attributes$nitrate_polluted_area_fraction <= input$nirtatePollutedArea
           )]
         )
         
         # Select basins with nitrate polluted area smaller than certain values
-        selected_gauge_id <<- intersect(
-          selected_gauge_id, 
+        selected <- intersect(
+          selected, 
+          attributes$gauge_id[which(
+            attributes$protected_area_fraction >= input$protectedArea
+          )]
+        )
+        
+        selected <- intersect(
+          selected, 
           attributes$gauge_id[which(
             attributes$protected_area_fraction >= input$protectedArea
           )]
         )
         
         
+        
         # Update map of selected stations
-        showGauge(stations, selected_gauge_id)
+        showGauge(stations, selected)
         
         # Update catchment attribute taböe
         output$catchment_attributes <- DT::renderDataTable({
           showDataFrame(attributes, session, "catchment_attributes", 
-                        selected_gauge_id)
+                        selected)
         })
         
         # Update hydrological indicator talbe
         output$hydro_indicator <- DT::renderDataTable({
           showDataFrame(hydro_indicator %>% 
-                          filter(gauge_id %in% selected_gauge_id), 
+                          filter(gauge_id %in% selected), 
                         session,  "hydro_indicator")
         })
         
+        # Assign to global variables so can be used later
+        selected_gauge_id <<- selected
       }
       
     }, ignoreInit = TRUE)
