@@ -38,14 +38,14 @@ navbarPage(
               
               dateRangeInput("selectPeriod", 
                              "1. Select period for analysis",
-                             start = as.Date("2001-01-01"),
+                             start = as.Date("1990-01-01"),
                              end = as.Date("2020-12-31"),
                              min = as.Date("1980-01-01"),
                              max = as.Date("2020-12-31")),
               
               numericInput("maxQmissing", 
                            "2. Maximum allowable missing streamflow (%)",
-                           min = 0, max = 99, value = 5, width = "85%"),
+                           min = 0, max = 99, value = 10, width = "85%"),
               
               h5("3. Run subseting catchments"),
               
@@ -95,12 +95,20 @@ navbarPage(
               numericInput("protectedArea", 
                            "7. Minimum nature protected area (%)",
                            min = 0, max = 100, value = 0, width = "85%"),
+
+              numericInput("soilMoisture", 
+                           "8. Minimum duration soil moisture above PWP (%)",
+                           min = 0, max = 100, value = 0, width = "85%"),
+
+              #h5("9. No trend in groundwater levels"),
+              checkboxInput("gwTrend", 
+                            "9. No trend in groundwater level", FALSE),
               
               textInput("groundwater_quality", 
-                           "8. Minimum river segment with good quality (%)",
+                           "10. Min. river segment with good quality (%)",
                            value = "No data available"),
               
-              h5("9. Add more criteria here..."),
+              h5("11. Add more criteria here..."),
               
             ),
             
