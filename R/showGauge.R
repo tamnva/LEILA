@@ -49,7 +49,7 @@ showGauge <- function(stations_shape,
         pal = pal,
         values = color_values,
         position = 'topleft',
-        title = "Legend",
+        title = "Distance to near nat. (%)",
         opacity = 1
       ) 
   }

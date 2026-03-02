@@ -317,42 +317,47 @@ function(input, output, session) {
     if ((input$selectRegressionModel == "Multiple Linear Regression") &
         !is.null(hydro_indicator)){
       
+      temp <- near_nat_states
+      
       # Get the data frame of independent variables
-      near_nat_states <<- attributes %>% 
+      temp <- attributes %>% 
         filter(gauge_id %in% hydro_indicator$gauge_id) %>%
         select(c(gauge_id, input$selectIndepVar))
       
       # Get the near natural state using regression equation
       for (var in input$selectDepVar){
-        near_nat_states[[paste0(var, "_near_nat")]] <<- as.numeric(
-          predict(model[[var]], near_nat_states)
+        temp[[paste0(var, "_near_nat")]] <- as.numeric(
+          predict(model[[var]], temp)
           )
       }
       
       # Combine with current state
-      near_nat_states <<- near_nat_states %>%
+      temp <- temp %>%
         left_join(hydro_indicator %>% 
                     select(c(gauge_id, input$selectDepVar)),
                   by = "gauge_id")
 
       # Calculate the differences between near natural and current states
       for (var in input$selectDepVar){ #c("q_mean","q_std")){ #input$selectDepVar){
-        near_nat_states <<- near_nat_states %>%
-          mutate(!!paste0(var, "_diff") := !!sym(paste0(var, "_near_nat")) - 
-                   !!sym(var))
+        temp <- temp %>%
+          mutate(!!paste0(var, "_diff") := 
+                   100*(!!sym(var) - !!sym(paste0(var, "_near_nat")))/
+                   (!!sym(paste0(var, "_near_nat"))))
       }
+  
+      # Assign back to global variable to use later
+      near_nat_states <<- temp
     }
     
   }, ignoreInit = TRUE)
-  
+
   #----------------------------------------------------------------------------#
   #        Differences between current states and target indictors             #
   #----------------------------------------------------------------------------#  
   observeEvent(input$selectDepVar, {
     updateSelectInput(session, "selectDiff", 
-                      "1. Select hydrological indicators",
-                      choices = paste0(input$selectDepVar, "_near_nat - ",
-                                       input$selectDepVar),
+                      "1. Visualize distance to",
+                      choices = paste0(input$selectDepVar, "_near_nat"),
                       selected = NA)
   }, ignoreInit = TRUE)
   
@@ -363,13 +368,11 @@ function(input, output, session) {
     
     # Get variables name
     if (!is.null(near_nat_states)){
-      variable <- paste0(strsplit(input$selectDiff, split = " - ")[[1]][2], 
-                         "_diff")
+      variable <- paste0(gsub("_near_nat", "", input$selectDiff), "_diff")
       
       new_stations <- stations %>% 
         filter(gauge_id %in% hydro_indicator$gauge_id) %>%
         left_join(near_nat_states, by = "gauge_id")
-
       
       if (input$selectBasinGroup == "Near natural basins"){
         show_gauge_id <- selected_gauge_id
@@ -380,7 +383,15 @@ function(input, output, session) {
       }
       
       showGauge(new_stations, show_gauge_id, colorby = variable)
-      } 
+      
+      # Update hydrological indicator talbe
+      output$hydro_indicator <- DT::renderDataTable({
+        showDataFrame(
+          st_drop_geometry(new_stations) %>% 
+            mutate(across(where(is.numeric), function(x) round(x, 2))),
+          session,  "hydro_indicator")
+      })
+    } 
     }, ignoreInit = TRUE)
    
 

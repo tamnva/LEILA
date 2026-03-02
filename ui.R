@@ -144,7 +144,7 @@ navbarPage(
               title = "4.State", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
-              selectInput("selectDiff", "1. Select hydrological indicator",
+              selectInput("selectDiff", "1. Visualize distance to",
                           multiple = FALSE, 
                           choices = NA,
                           selected = NA),
