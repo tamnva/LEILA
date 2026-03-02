@@ -382,20 +382,23 @@ function(input, output, session) {
         show_gauge_id <- new_stations$gauge_id
       }
       
-      showGauge(new_stations, show_gauge_id, colorby = variable)
+      shinyCatch(showGauge(new_stations, show_gauge_id, colorby = variable),
+                 blocking_level = "error")
+      
       
       # Update hydrological indicator talbe
-      output$hydro_indicator <- DT::renderDataTable({
-        showDataFrame(
-          st_drop_geometry(new_stations) %>% 
-            mutate(across(where(is.numeric), function(x) round(x, 2))),
-          session,  "hydro_indicator")
-      })
+      shinyCatch(
+        output$hydro_indicator <- DT::renderDataTable({
+          showDataFrame(
+            st_drop_geometry(new_stations) %>% 
+              mutate(across(where(is.numeric), function(x) round(x, 2))),
+            session,  "hydro_indicator")
+        }),
+        blocking_level = "error")
+      
     } 
     }, ignoreInit = TRUE)
    
-
-
   
   #----------------------------------------------------------------------------#
   #    Select catchment based on streamflow data availability (Data)           #

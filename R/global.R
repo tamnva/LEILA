@@ -1,4 +1,5 @@
 library(leaflet)
+library(spsComps)
 library(dplyr)
 library(tidyr)
 library(readr)
