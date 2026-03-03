@@ -41,6 +41,7 @@ schutzgetbiet           <- st_transform(st_read("data/schutzgebiet",
 nitratbelastete_gebiete <- st_read("data/Nitratbelastete_Gebiete.shp", 
                                    quiet = TRUE)
 huek                    <- rast("data/huek.tif")
+population_density      <- rast("data/population_density.tif")
 
 # Read groundwater wells
 gw_wells <- read.csv("data/gw_meta_monthly_geo_qc.txt", sep = ";", 
@@ -49,25 +50,7 @@ gw_wells <- st_as_sf(gw_wells, coords = c("x_EPSG25832", "y_EPSG25832"),
                      crs = 25832, remove = FALSE)
 gw_wells <- st_transform(gw_wells, 4326)
 
-
-# Add nitrate polluted and protected areas into the attributes. Run again only 
-# if you replace the nitratbelastete_gebiete an schutzgetbiet maps with new maps
-if (FALSE){
-  
-  source("R/overlappingArea.R")
-  
-  attributes <- attributes %>% 
-    left_join(overlappingArea(catchments, nitratbelastete_gebiete) %>%
-                rename(nitrate_polluted_area_fraction = percent_cover), 
-              by = "gauge_id")
-  
-  # Add protected areas into the attributes
-  attributes <- attributes %>% 
-    left_join(overlappingArea(catchments, schutzgetbiet) %>%
-                rename(protected_area_fraction = percent_cover), 
-              by = "gauge_id")
-  
-  data.table::fwrite(attributes, "data/attributes.csv")
-}
-
 message(" Done reading all data")
+  
+
+

@@ -60,10 +60,26 @@ navbarPage(
             bslib::nav_panel(
               title = "2. Select basin", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
+
+              h5(tags$b("1. Near-natural conditions")),
+              numericInput("maxNrDams", 
+                           "Maximum number of dams",
+                           min = 0, max = 50, value = 50, width = "85%"),
               
-             
+              numericInput("maxAgri", 
+                           "Maximum agricultural land area (%)",
+                           min = 0, max = 100, value = 100, width = "85%"),
               
-              selectInput("selectFlowRegime", "1. Select flow regime",
+              numericInput("maxUrban", 
+                           "Maximum urban land area (%)",
+                           min = 0, max = 100, value = 100, width = "85%"),
+              
+              numericInput("annualQTrend", 
+                           "No Q trend (max |sen's slope|)",
+                           min = 0.001, max = 0.1, value = 0.1, width = "85%"),
+              
+              h5(tags$b("2. Resilience to climate change")),
+              selectInput("selectFlowRegime", "Select flow regime",
                           multiple = TRUE,
                           choices = c("None",
                                       "cvq_autumn > 1.1 (erratic)",
@@ -72,40 +88,26 @@ navbarPage(
                                       "cvq_summer > 1.1 (erratic)"),
                           selected = "None"),
               
-              numericInput("maxNrDams", 
-                           "2. Maximum number of dams",
-                           min = 0, max = 50, value = 50, width = "85%"),
-              
-              numericInput("maxAgri", 
-                           "3. Maximum agricultural land area (%)",
-                           min = 0, max = 100, value = 100, width = "85%"),
-              
-              numericInput("maxUrban", 
-                           "4. Maximum urban land area (%)",
-                           min = 0, max = 100, value = 100, width = "85%"),
-              
-              numericInput("annualQTrend", 
-                           "5. No Q trend (max |sen's slope|)",
-                           min = 0.001, max = 0.1, value = 0.1, width = "85%"),
-              
+             
+              h5(tags$b("3. Good ecological and water quality")),
               numericInput("nirtatePollutedArea", 
-                           "6. Maxium GW nitrate polluted area (%)",
+                           "Maxium GW nitrate polluted area (%)",
                            min = 0, max = 100, value = 25, width = "85%"),
               
               numericInput("protectedArea", 
-                           "7. Minimum nature protected area (%)",
+                           "Minimum nature protected area (%)",
                            min = 0, max = 100, value = 0, width = "85%"),
 
               numericInput("soilMoisture", 
-                           "8. Minimum duration soil moisture above PWP (%)",
+                           "Minimum duration soil moisture above PWP (%)",
                            min = 0, max = 100, value = 0, width = "85%"),
 
               #h5("9. No trend in groundwater levels"),
               checkboxInput("gwTrend", 
-                            "9. No trend in groundwater level", FALSE),
+                            "No trend in groundwater level", FALSE),
               
               textInput("groundwater_quality", 
-                           "10. Min. river segment with good quality (%)",
+                           "Min. river segment with good quality (%)",
                            value = "No data available"),
               
               h5("11. Add more criteria here..."),

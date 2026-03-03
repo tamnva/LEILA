@@ -17,6 +17,9 @@ function(input, output, session) {
       addRasterImage(huek, 
                      opacity = 0.7, 
                      group = "Hydrogeologie") %>%
+      addRasterImage(population_density,
+                     opacity = 0.7, 
+                     group = "Bevölkerungsdichte")  %>%
       addPolygons(data = schutzgetbiet, 
                   fillColor = "#006400", 
                   fillOpacity = 0.6, 
@@ -74,14 +77,16 @@ function(input, output, session) {
                           "Hydrogeologie",
                           "Naturschutzgebiet",
                           "Nitratbelastete Gebiete",
-                          "Grundwassermessstelle"),
+                          "Grundwassermessstelle",
+                          "Bevölkerungsdichte"),
         options = layersControlOptions(position = "bottomleft")
       )  %>%
       hideGroup(c("Hydrogeologie", 
                   "Naturschutzgebiet",
                   "Nitratbelastete Gebiete",
                   "Grundwassermessstelle",
-                  "Einzugsgebiete")) %>%
+                  "Einzugsgebiete",
+                  "Bevölkerungsdichte")) %>%
       setView(lng = 9, lat = 50, zoom = 5)
   })
   
