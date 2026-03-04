@@ -403,7 +403,7 @@ function(input, output, session) {
         leafletProxy("map") %>%
           clearGroup("Gewägktes Einzugsgebiet") %>%
           addPolygons(
-            data = catchments %>% select(gauge_id == input$map_marker_click$id),
+            data = catchments %>% filter(gauge_id == input$map_marker_click$id),
             stroke = TRUE,
             fillColor = "#00000000",
             weight = 2,
