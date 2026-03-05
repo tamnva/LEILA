@@ -314,7 +314,7 @@ function(input, output, session) {
                   by = "gauge_id")
 
       # Calculate the differences between near natural and current states
-      for (var in input$selectDepVar){ #c("q_mean","q_std")){ #input$selectDepVar){
+      for (var in input$selectDepVar){
         temp <- temp %>%
           mutate(!!paste0(var, "_diff") :=  100*
                    (!!sym(var) - !!sym(paste0(var, "_near_nat")))/

@@ -51,6 +51,3 @@ gw_wells <- st_as_sf(gw_wells, coords = c("x_EPSG25832", "y_EPSG25832"),
 gw_wells <- st_transform(gw_wells, 4326)
 
 message(" Done reading all data")
-  
-
-

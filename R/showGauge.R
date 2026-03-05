@@ -31,8 +31,11 @@ showGauge <- function(stations_shape,
   } else {
     
     color_values <- stations_shape[[colorby]] 
-    pal <- colorNumeric(palette = "viridis", 
-                        domain = color_values)
+    
+    breaks <- quantile(color_values, probs = seq(0, 1, length.out = 6), 
+                       na.rm = TRUE)
+    
+    pal <- colorBin(palette = "viridis", domain = color_values, bin = breaks)
     
     leafletProxy("map") %>%
       clearGroup("Abflussmessstelle") %>%
@@ -41,7 +44,7 @@ showGauge <- function(stations_shape,
                        group = "Abflussmessstelle",
                        fillColor = pal(color_values),
                        stroke = FALSE,
-                       fillOpacity = 1,
+                       fillOpacity = 0.8,
                        layerId = ~ gauge_id
       ) %>%
       clearControls() %>%
@@ -50,7 +53,8 @@ showGauge <- function(stations_shape,
         values = color_values,
         position = 'topleft',
         title = "Distance to near nat. (%)",
-        opacity = 1
+        opacity = 1,
+        labFormat = labelFormat(digits = 0)
       ) 
   }
 }
