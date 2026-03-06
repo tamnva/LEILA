@@ -160,17 +160,31 @@ navbarPage(
               title = "4. Visualize", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
-              selectInput("selectDiff", "1. Visualize distance to",
-                          multiple = FALSE, 
-                          choices = NA,
-                          selected = NA),
-              
-              selectInput("selectBasinGroup", "2. Select basins",
+              selectInput("selectBasinGroup", "1. Select basins group",
                           multiple = FALSE,
                           choices = c("All",
                                       "Near natural basins",
                                       "Non near-natural basin"),
                           selected = "All"),
+            
+              selectInput("visualType", "2. Select type of visualization",
+                          multiple = FALSE, 
+                          choices = c("Distance to neat-natural states",
+                                      "Catchment attributes",
+                                      "Hydrological indicators",
+                                      "Wastewater discharge",
+                                      "Groundwater wells"),
+                          selected = "Distance to neat-natural states"),
+              
+              
+              conditionalPanel(
+                condition = "input.visualType == 'Distance to neat-natural states'",
+                selectInput("selectDiff", "Distance to ",
+                            multiple = FALSE, 
+                            choices = NA,
+                            selected = NA),
+              ),
+              
               
               h5("   "),
               h5("   "),
