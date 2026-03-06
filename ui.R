@@ -157,7 +157,7 @@ navbarPage(
             ),
             
             bslib::nav_panel(
-              title = "4.State", selected = TRUE,
+              title = "4. Visualize", selected = TRUE,
               tags$hr(class = "custom-line"), h5(),
               
               selectInput("selectDiff", "1. Visualize distance to",
