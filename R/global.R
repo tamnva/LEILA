@@ -52,6 +52,6 @@ gw_wells <- st_transform(gw_wells, 4326)
 
 
 # Read abwassermenge
-waste_water_discharge <- st_read("data/abwassermenge.geojson")
+waste_water_discharge <- st_read("data/abwassermenge.geojson", quiet = TRUE)
 
 message(" Done reading all data")

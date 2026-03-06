@@ -73,7 +73,10 @@ function(input, output, session) {
                        group = "Abwassermenge",
                        fillColor = "#DC267F",
                        fillOpacity = 0.7,
-                       stroke = FALSE
+                       stroke = FALSE,
+                       popup = ~ paste(durchschnitt_abwassermenge, 
+                                       abwassermenge_einheit),
+                       layerId = ~ durchschnitt_abwassermenge
       ) %>%
       addLayersControl(
         baseGroups = c("CartoDBPositron", "CartoDBPositronNolabel", 
