@@ -50,4 +50,8 @@ gw_wells <- st_as_sf(gw_wells, coords = c("x_EPSG25832", "y_EPSG25832"),
                      crs = 25832, remove = FALSE)
 gw_wells <- st_transform(gw_wells, 4326)
 
+
+# Read abwassermenge
+waste_water_discharge <- st_read("data/abwassermenge.geojson")
+
 message(" Done reading all data")

@@ -20,6 +20,14 @@ function(input, output, session) {
       addRasterImage(population_density,
                      opacity = 0.7, 
                      group = "Bevölkerungsdichte")  %>%
+      addPolygons(data = subset(catchments),
+                  stroke = TRUE,
+                  fillColor = "#00000000",
+                  color = "#C4C4C4",
+                  weight = 1,
+                  popup = ~ showPopup(gauge_id),
+                  group = "Einzugsgebiete",
+                  layerId = ~ gauge_id) %>%
       addPolygons(data = schutzgetbiet, 
                   fillColor = "#006400", 
                   fillOpacity = 0.6, 
@@ -60,15 +68,13 @@ function(input, output, session) {
                        popup = ~ UFZ.ID,
                        layerId = ~ UFZ.ID
       ) %>%
-      addPolygons(
-        data = subset(catchments),
-        stroke = TRUE,
-        fillColor = "#00000000",
-        color = "#C4C4C4",
-        weight = 1,
-        popup = ~ showPopup(gauge_id),
-        group = "Einzugsgebiete",
-        layerId = ~ gauge_id) %>%
+      addCircleMarkers(data = waste_water_discharge,
+                       radius = 2,
+                       group = "Abwassermenge",
+                       fillColor = "#DC267F",
+                       fillOpacity = 0.7,
+                       stroke = FALSE
+      ) %>%
       addLayersControl(
         baseGroups = c("CartoDBPositron", "CartoDBPositronNolabel", 
                        "OpenStreetMap", "OpenTopoMap", "WorldImagery"),
@@ -78,7 +84,8 @@ function(input, output, session) {
                           "Naturschutzgebiet",
                           "Nitratbelastete Gebiete",
                           "Grundwassermessstelle",
-                          "Bevölkerungsdichte"),
+                          "Bevölkerungsdichte",
+                          "Abwassermenge"),
         options = layersControlOptions(position = "bottomleft")
       )  %>%
       hideGroup(c("Hydrogeologie", 
@@ -86,7 +93,8 @@ function(input, output, session) {
                   "Nitratbelastete Gebiete",
                   "Grundwassermessstelle",
                   "Einzugsgebiete",
-                  "Bevölkerungsdichte")) %>%
+                  "Bevölkerungsdichte",
+                  "Abwassermenge")) %>%
       setView(lng = 9, lat = 50, zoom = 5)
   })
   
@@ -329,7 +337,7 @@ function(input, output, session) {
 
   
   #----------------------------------------------------------------------------#
-  #        Differences between current states and target indictors             #
+  #        Differences between current states and target indicators             #
   #----------------------------------------------------------------------------#  
   observeEvent(input$selectDepVar, {
     updateSelectInput(session, "selectDiff", 
