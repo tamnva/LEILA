@@ -53,7 +53,6 @@ navbarPage(
                            "Select & derive streamflow statistics",
                            width = "68%"),
               h5(),
-              h5("4. Derive other hydrological indicators..."),
             ),
             
             # Select "targeted catchment"
@@ -77,6 +76,10 @@ navbarPage(
               numericInput("annualQTrend", 
                            "No Q trend (max |sen's slope|)",
                            min = 0.001, max = 0.1, value = 0.1, width = "85%"),
+              
+              numericInput("maxWasteWaterDischarge", 
+                           "Maximum wastewater discharge (1000 m³/year)",
+                           min = 0, max = 10^6, value = 10^6, width = "85%"),
               
               h5(tags$b("2. Resilience to climate change")),
               selectInput("selectFlowRegime", "Select flow regime",
@@ -103,14 +106,17 @@ navbarPage(
                            min = 0, max = 100, value = 0, width = "85%"),
 
               #h5("9. No trend in groundwater levels"),
-              checkboxInput("gwTrend", 
-                            "No trend in groundwater level", FALSE),
+              #checkboxInput("gwTrend", 
+              #              "No trend in groundwater level", FALSE),
               
-              textInput("groundwater_quality", 
-                           "Min. river segment with good quality (%)",
-                           value = "No data available"),
+              #textInput("groundwater_quality", 
+              #             "Min. river segment with good quality (%)",
+              #             value = "No data available"),
               
-              h5("11. Add more criteria here..."),
+              h5(tags$b("3. Social aspect")),
+              sliderInput("popDensity", 
+                          "Select polution density (1000 person/km²)", 
+                          min = 0, max = 3, value = c(0, 3), step = 0.05),
               
             ),
             

@@ -184,7 +184,9 @@ function(input, output, session) {
       input$maxUrban,
       input$annualQTrend,
       input$nirtatePollutedArea,
-      input$protectedArea), 
+      input$protectedArea,
+      input$popDensity,
+      input$maxWasteWaterDischarge), 
     {
       
       if (!is.null(hydro_indicator)){
@@ -245,10 +247,27 @@ function(input, output, session) {
           ]
         )
         
+        # Select basin with minimum protected area
         selected <- intersect(
           selected, 
           attributes$gauge_id[which(
             attributes$protected_area_fraction >= input$protectedArea
+          )]
+        )
+
+        # Select basin with population density within a certain range
+        intersect_id <- intersect(
+          which(attributes$popdens >= 1000*input$popDensity[1]),
+          which(attributes$popdens <= 1000*input$popDensity[2])
+          )
+        selected <- intersect(selected, attributes$gauge_id[intersect_id])
+        
+        # Select basin with minimum protected area
+        selected <- intersect(
+          selected, 
+          attributes$gauge_id[which(
+            attributes$wastewater_discharge_m3_year <= 
+              1000*input$maxWasteWaterDischarge
           )]
         )
         
