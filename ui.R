@@ -143,17 +143,18 @@ navbarPage(
                           selected = NA),
               
               h5("4. Run regression model"),
-              actionButton("runRegression", "Run", width = "68%"),
+              actionButton("runRegression", 
+                           "Run & find near nat. states for all", 
+                           width = "68%"),
               
               h5(),
               div(
                 style = "height: 300px; overflow-y: auto; 
                 border: 1px solid #ccc; padding: 0px;",
-                plotlyOutput("regression_plot", height = "300px", width = "300px"),
+                plotlyOutput("regression_plot", height = "300px", 
+                             width = "300px"),
               ),
               
-              h5("5. Calcualte near-nat. states for all catchments"),
-              actionButton("calculate_near_nat", "Calculate", width = "68%"),
             ),
             
             bslib::nav_panel(
@@ -179,12 +180,21 @@ navbarPage(
               
               conditionalPanel(
                 condition = "input.visualType == 'Distance to neat-natural states'",
-                selectInput("selectDiff", "Distance to ",
+                selectInput("visual_distance_to_near_nat", "Distance to ",
                             multiple = FALSE, 
                             choices = NA,
                             selected = NA),
               ),
               
+              conditionalPanel(
+                condition = "input.visualType == 'Catchment attributes'",
+                selectInput("visual_catchment_attr", "Select atribute",
+                            multiple = FALSE, 
+                            choices = colnames(attributes),
+                            selected = NA),
+              ),
+              
+              actionButton("visual_selected_var", "Visualize", width = "68%"),
               
               h5("   "),
               h5("   "),

@@ -169,6 +169,11 @@ function(input, output, session) {
                         attributes %>% select(!c(gauge_id))
                         ))
     
+    # Update visualize variables
+    updateSelectInput(session, "visual_catchment_attr", "Select atribute",
+                choices = colnames(attributes),
+                selected = NA)
+    
     }, ignoreInit = TRUE)
   
   
@@ -294,7 +299,7 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   observeEvent(input$runRegression, {
     
-    # Currently this is for multi-linear regression model
+    # Setup and run multi-variable regression equation
     dependent_var <- input$selectDepVar  
     independent_var <- input$selectIndepVar 
     
@@ -316,51 +321,46 @@ function(input, output, session) {
         layout(height = 280*length(model$plt))
       )
     
-  }, ignoreInit = TRUE)
-  
-  #----------------------------------------------------------------------------#
-  #              Calculate near natural states of all catchments               #
-  #----------------------------------------------------------------------------#
-  observeEvent(input$calculate_near_nat, {
+    # Cacluate near natural states for all others variables
+    # Get the data frame of independent variables
+    temp <- attributes %>% 
+      filter(gauge_id %in% hydro_indicator$gauge_id) %>%
+      select(c(gauge_id, input$selectIndepVar))
     
-    if ((input$selectRegressionModel == "Multiple Linear Regression") &
-        !is.null(hydro_indicator)){
-      
-      # Get the data frame of independent variables
-      temp <- attributes %>% 
-        filter(gauge_id %in% hydro_indicator$gauge_id) %>%
-        select(c(gauge_id, input$selectIndepVar))
-      
-      # Get the near natural state using regression equation
-      for (var in input$selectDepVar){
-        temp[[paste0(var, "_near_nat")]] <- predict(model[[var]], temp)
-        }
-      
-      # Combine with current state
-      temp <- temp %>%
-        left_join(hydro_indicator %>% select(c(gauge_id, input$selectDepVar)),
-                  by = "gauge_id")
-
-      # Calculate the differences between near natural and current states
-      for (var in input$selectDepVar){
-        temp <- temp %>%
-          mutate(!!paste0(var, "_diff") :=  100*
-                   (!!sym(var) - !!sym(paste0(var, "_near_nat")))/
-                   (!!sym(paste0(var, "_near_nat"))))
-      }
-      
-      # Assign back to global variable to use later
-      near_nat_states <<- temp
+    # Get the near natural state using regression equation
+    for (var in input$selectDepVar){
+      temp[[paste0(var, "_near_nat")]] <- predict(model[[var]], temp)
     }
     
+    # Combine with current state
+    temp <- temp %>%
+      left_join(hydro_indicator %>% select(c(gauge_id, input$selectDepVar)),
+                by = "gauge_id")
+    
+    # Calculate the differences between near natural and current states
+    for (var in input$selectDepVar){
+      temp <- temp %>%
+        mutate(!!paste0(var, "_diff") :=  100*
+                 (!!sym(var) - !!sym(paste0(var, "_near_nat")))/
+                 (!!sym(paste0(var, "_near_nat"))))
+    }
+    
+    # Assign back to global variable to use later
+    near_nat_states <<- temp
+    
+    # Update select distance to near natural state for visualization
+    choices <- paste0(input$selectDepVar, "_near_nat")
+    updateSelectInput(session, "visual_distance_to_near_nat", "Distance to ",
+                      choices = choices,
+                      selected = choices[1])
+    
   }, ignoreInit = TRUE)
 
-  
   #----------------------------------------------------------------------------#
   #        Differences between current states and target indicators             #
   #----------------------------------------------------------------------------#  
   observeEvent(input$selectDepVar, {
-    updateSelectInput(session, "selectDiff", 
+    updateSelectInput(session, "visual_distance_to_near_nat", 
                       "1. Visualize distance to",
                       choices = paste0(input$selectDepVar, "_near_nat"),
                       selected = NA)
@@ -370,11 +370,13 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   #              Calculate near natural states of all catchments               #
   #----------------------------------------------------------------------------#
-  observeEvent(c(input$selectDiff, input$selectBasinGroup), {
+  
+  observeEvent(input$visual_selected_var, {
     
     # Get variables name
     if (!is.null(near_nat_states)){
-      variable <- paste0(gsub("_near_nat", "", input$selectDiff), "_diff")
+      variable <- paste0(gsub("_near_nat", "", 
+                              input$visual_distance_to_near_nat), "_diff")
       
       new_stations <- stations %>% 
         filter(gauge_id %in% hydro_indicator$gauge_id) %>%
