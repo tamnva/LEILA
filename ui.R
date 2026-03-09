@@ -201,13 +201,13 @@ navbarPage(
   ),
   
   tabPanel(
-    "Einzugsgebiet Charakteristik",
+    "Catchment attribute",
     hr(),
     DT::dataTableOutput("catchment_attributes")
   ),
   
   tabPanel(
-    "Hydrologische Indikatoren",
+    "Hydrological indicator",
     hr(),
     DT::dataTableOutput("hydro_indicator")
   )

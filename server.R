@@ -16,17 +16,17 @@ function(input, output, session) {
       addScaleBar(position = "bottomleft") %>%
       addRasterImage(huek, 
                      opacity = 0.7, 
-                     group = "Hydrogeologie") %>%
+                     group = "Hydrological unit") %>%
       addRasterImage(population_density,
                      opacity = 0.7, 
-                     group = "Bevölkerungsdichte")  %>%
+                     group = "Population density (people/km²)")  %>%
       addPolygons(data = subset(catchments),
                   stroke = TRUE,
                   fillColor = "#00000000",
                   color = "#C4C4C4",
                   weight = 1,
                   popup = ~ showPopup(gauge_id),
-                  group = "Einzugsgebiete",
+                  group = "Catchment boundary",
                   layerId = ~ gauge_id) %>%
       addPolygons(data = schutzgetbiet, 
                   fillColor = "#006400", 
@@ -34,25 +34,23 @@ function(input, output, session) {
                   color = "#006400", 
                   stroke = TRUE, 
                   weight = 1, 
-                  group = "Naturschutzgebiet") %>%
+                  group = "Nature protection area") %>%
       addPolygons(data = nitratbelastete_gebiete, 
                   fillColor = "#DC3220", 
                   fillOpacity = 0.6, 
                   color = "#DC3220", 
                   stroke = TRUE, 
                   weight = 1, 
-                  group = "Nitratbelastete Gebiete") %>% 
+                  group = "Nitrate pollutated area") %>% 
       addProviderTiles(provider = providers$CartoDB.PositronNoLabels,
                        group = "CartoDBPositronNolabel") %>%
       addProviderTiles(provider = providers$CartoDB.Positron,
                        group = "CartoDBPositron") %>%
-      addProviderTiles(provider = providers$OpenTopoMap,
-                       group = "OpenTopoMap") %>%
       addProviderTiles(provider = providers$Esri.WorldImagery,
                        group = "WorldImagery") %>%
       addCircleMarkers(data = stations,
                        radius = 3,
-                       group = "Abflussmessstelle",
+                       group = "Streamgauge",
                        fillColor = "#FFC107",
                        fillOpacity = 0.8,
                        stroke = FALSE,
@@ -61,7 +59,7 @@ function(input, output, session) {
       ) %>%
       addCircleMarkers(data = gw_wells,
                        radius = 2,
-                       group = "Grundwassermessstelle",
+                       group = "Groundwater well",
                        fillColor = "#2798F5",
                        fillOpacity = 0.7,
                        stroke = FALSE,
@@ -70,7 +68,7 @@ function(input, output, session) {
       ) %>%
       addCircleMarkers(data = waste_water_discharge,
                        radius = 2,
-                       group = "Abwassermenge",
+                       group = "Wastewater discharge",
                        fillColor = "#DC267F",
                        fillOpacity = 0.7,
                        stroke = FALSE,
@@ -80,24 +78,24 @@ function(input, output, session) {
       ) %>%
       addLayersControl(
         baseGroups = c("CartoDBPositron", "CartoDBPositronNolabel", 
-                       "OpenStreetMap", "OpenTopoMap", "WorldImagery"),
-        overlayGroups = c("Abflussmessstelle", 
-                          "Einzugsgebiete",
-                          "Hydrogeologie",
-                          "Naturschutzgebiet",
-                          "Nitratbelastete Gebiete",
-                          "Grundwassermessstelle",
-                          "Bevölkerungsdichte",
-                          "Abwassermenge"),
+                       "OpenStreetMap", "WorldImagery"),
+        overlayGroups = c("Streamgauge", 
+                          "Catchment boundary",
+                          "Hydrological unit",
+                          "Nature protection area",
+                          "Nitrate pollutated area",
+                          "Groundwater well",
+                          "Population density (people/km²)",
+                          "Wastewater discharge"),
         options = layersControlOptions(position = "bottomleft")
       )  %>%
-      hideGroup(c("Hydrogeologie", 
-                  "Naturschutzgebiet",
-                  "Nitratbelastete Gebiete",
-                  "Grundwassermessstelle",
-                  "Einzugsgebiete",
-                  "Bevölkerungsdichte",
-                  "Abwassermenge")) %>%
+      hideGroup(c("Hydrological unit", 
+                  "Nature protection area",
+                  "Nitrate pollutated area",
+                  "Groundwater well",
+                  "Catchment boundary",
+                  "Population density (people/km²)",
+                  "Wastewater discharge")) %>%
       setView(lng = 9, lat = 50, zoom = 5)
   })
   
