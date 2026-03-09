@@ -171,7 +171,7 @@ function(input, output, session) {
     
     # Update visualize variables
     updateSelectInput(session, "visual_catchment_attr", "Select atribute",
-                choices = colnames(attributes),
+                choices = names(attributes)[sapply(attributes, is.numeric)],
                 selected = NA)
     
     }, ignoreInit = TRUE)
@@ -370,14 +370,9 @@ function(input, output, session) {
   #----------------------------------------------------------------------------#
   #              Calculate near natural states of all catchments               #
   #----------------------------------------------------------------------------#
-  
   observeEvent(input$visual_selected_var, {
-    
-    # Get variables name
+  
     if (!is.null(near_nat_states)){
-      variable <- paste0(gsub("_near_nat", "", 
-                              input$visual_distance_to_near_nat), "_diff")
-      
       new_stations <- stations %>% 
         filter(gauge_id %in% hydro_indicator$gauge_id) %>%
         left_join(near_nat_states, by = "gauge_id")
@@ -389,6 +384,14 @@ function(input, output, session) {
       } else {
         show_gauge_id <- new_stations$gauge_id
       }
+    }
+        
+    # Get variables name
+    if (!is.null(near_nat_states) & 
+        input$visualType == "Distance to neat-natural states"){
+      
+      variable <- paste0(gsub("_near_nat", "", 
+                              input$visual_distance_to_near_nat), "_diff")
       
       shinyCatch(showGauge(new_stations, show_gauge_id, colorby = variable),
                  blocking_level = "error")
@@ -402,8 +405,11 @@ function(input, output, session) {
             session,  "hydro_indicator")
         }),
         blocking_level = "error")
+    } else {
       
-    } 
+      message("Cannot visualize")
+      
+    }
     }, ignoreInit = TRUE)
    
   
