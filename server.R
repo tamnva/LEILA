@@ -1,3 +1,13 @@
+#==============================================================================#
+#               The procedure of this R script is as follows:                  #
+# 0. Load background maps and defaults values                                  #
+# 1. Select catchment based on streamflow data availability (Data)             #
+# 2. Select near-natural catchments                                            #
+# 3. Regression (linking hydro. indicators with catchment attributes)          #
+# 4. Visualization                                                             #
+# 5. Other reactive functions                                                  #
+#==============================================================================#
+
 library(plotly)
 
 function(input, output, session) {
@@ -7,9 +17,9 @@ function(input, output, session) {
     shiny::stopApp()
   })
   
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   #               0. Background + default maps/tables                          #
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   output$map <- renderLeaflet({
     leaflet() %>%
       addTiles(group = "OpenStreetMap") %>%
@@ -103,9 +113,9 @@ function(input, output, session) {
     showDataFrame(attributes, session, "catchment_attributes", NULL)
   })
   
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   #    1. Select catchment based on streamflow data availability (Data)        #
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   observeEvent(input$dataSubset, {
 
     attributes <<- read_csv("data/attributes.csv", show_col_types = FALSE)
@@ -177,9 +187,9 @@ function(input, output, session) {
     }, ignoreInit = TRUE)
   
   
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   #                         2. Select near-natural catchments                  #
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   observeEvent(
     c(input$selectFlowRegime,
       input$maxAgri,
@@ -294,9 +304,9 @@ function(input, output, session) {
       
     }, ignoreInit = TRUE)
   
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   #      3. Regression (linking hydro. indicators with catchment attributes)   #
-  #----------------------------------------------------------------------------#
+  #============================================================================#
   observeEvent(input$runRegression, {
     
     # Setup and run multi-variable regression equation
@@ -357,7 +367,7 @@ function(input, output, session) {
   }, ignoreInit = TRUE)
 
   #----------------------------------------------------------------------------#
-  #        Differences between current states and target indicators             #
+  #        Differences between current states and target indicators            #
   #----------------------------------------------------------------------------#  
   observeEvent(input$selectDepVar, {
     updateSelectInput(session, "visual_distance_to_near_nat", 
@@ -367,9 +377,9 @@ function(input, output, session) {
   }, ignoreInit = TRUE)
   
   
-  #----------------------------------------------------------------------------#
-  #              Calculate near natural states of all catchments               #
-  #----------------------------------------------------------------------------#
+  #============================================================================#
+  #                               4. Visualization                             #
+  #============================================================================#
   observeEvent(input$visual_selected_var, {
   
     if (!is.null(near_nat_states)){
@@ -412,10 +422,13 @@ function(input, output, session) {
     }
     }, ignoreInit = TRUE)
    
+  #============================================================================#
+  #                     5. Other reactive functions                            #
+  #============================================================================#
   
-  #----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------# 
   #                 Show catchment when click on table                         #
-  #----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------# 
   observeEvent(input$goto, {
     if (is.null(input$goto))
       return()
@@ -430,9 +443,9 @@ function(input, output, session) {
     })
   }, ignoreInit = TRUE)
   
-  #----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------# 
   #                 Show catchment shape file when click on gauge              #
-  #----------------------------------------------------------------------------#
+  #----------------------------------------------------------------------------# 
   observeEvent(input$map_marker_click, {
     if (!is.null(input$map_marker_click$id)){
       if (input$map_marker_click$id %in% catchments$gauge_id){
