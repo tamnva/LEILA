@@ -44,8 +44,11 @@ huek                    <- rast("data/huek.tif")
 population_density      <- rast("data/population_density.tif")
 
 # Read groundwater wells
-gw_wells <- read.csv("data/gw_meta_monthly_geo_qc.txt", sep = ";", 
-                     header = TRUE) %>% as_tibble()
+selected_wells <- read.csv("data/selected_well_per_catchment_unique.csv")
+gw_wells <- read.csv("data/gw_meta_monthly_geo_qc.txt", 
+                     sep = ";", header = TRUE) %>% as_tibble() %>%
+  filter(UFZ.ID %in% selected_wells$well_id)
+
 gw_wells <- st_as_sf(gw_wells, coords = c("x_EPSG25832", "y_EPSG25832"), 
                      crs = 25832, remove = FALSE)
 gw_wells <- st_transform(gw_wells, 4326)

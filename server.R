@@ -69,7 +69,7 @@ function(input, output, session) {
       ) %>%
       addCircleMarkers(data = gw_wells,
                        radius = 2,
-                       group = "Groundwater well",
+                       group = "Selected groundwater well",
                        fillColor = "#2798F5",
                        fillOpacity = 0.7,
                        stroke = FALSE,
@@ -94,7 +94,7 @@ function(input, output, session) {
                           "Hydrological unit",
                           "Nature protection area",
                           "Nitrate pollutated area",
-                          "Groundwater well",
+                          "Selected groundwater well",
                           "Population density (people/km²)",
                           "Wastewater discharge"),
         options = layersControlOptions(position = "bottomleft")
@@ -102,7 +102,7 @@ function(input, output, session) {
       hideGroup(c("Hydrological unit", 
                   "Nature protection area",
                   "Nitrate pollutated area",
-                  "Groundwater well",
+                  "Selected groundwater well",
                   "Catchment boundary",
                   "Population density (people/km²)",
                   "Wastewater discharge")) %>%
