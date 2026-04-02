@@ -25,7 +25,7 @@ navbarPage(
         absolutePanel(
           id = "controls", class = "panel panel-default", fixed = TRUE, 
           draggable = FALSE, top = 65, left = "auto", right = 15, 
-          bottom = "auto", width = 500, height = "85%", overflow = "auto",
+          bottom = "auto", width = 600, height = "85%", overflow = "auto",
           
           bslib::navset_card_underline(
             id = "navset",

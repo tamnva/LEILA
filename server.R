@@ -183,8 +183,7 @@ function(input, output, session) {
     updateSelectInput(session, "visual_catchment_attr", "Select atribute",
                 choices = names(attributes)[sapply(attributes, is.numeric)],
                 selected = NA)
-    
-    }, ignoreInit = TRUE)
+    }, ignoreNULL = FALSE)
   
   
   #============================================================================#
