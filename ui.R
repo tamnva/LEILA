@@ -101,9 +101,9 @@ navbarPage(
                            "Minimum nature protected area (%)",
                            min = 0, max = 100, value = 0, width = "85%"),
 
-              numericInput("soilMoisture", 
-                           "Minimum duration soil moisture above PWP (%)",
-                           min = 0, max = 100, value = 0, width = "85%"),
+              #numericInput("soilMoisture", 
+              #             "Minimum duration soil moisture above PWP (%)",
+              #             min = 0, max = 100, value = 0, width = "85%"),
 
               #h5("9. No trend in groundwater levels"),
               #checkboxInput("gwTrend", 

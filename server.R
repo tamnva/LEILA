@@ -203,102 +203,71 @@ function(input, output, session) {
       
       if (!is.null(hydro_indicator)){
 
-        # Selected gauge id
-        selected <- hydro_indicator$gauge_id
+        #----------------------------------------------------------------------
+        selected <- hydro_indicator
         
-        # Selected basins from flow regime
-        if (!"None" %in% input$selectFlowRegime){
-          temp <- hydro_indicator
-          for (condition in input$selectFlowRegime){
+        if (!"None" %in% selectFlowRegime){
+          for (condition in selectFlowRegime){
             colname <- strsplit(condition, " ")[[1]][1]
-            temp <- temp %>% filter(!!sym(colname) > 1.1)
+            selected <- selected %>% filter(!!sym(colname) > 1.1)
           }
-          selected <- intersect(selected, temp$gauge_id)
-        }
+        } 
         
-        # Select basins from maximum agricultural area
-        selected <- intersect(
-          selected, attributes$gauge_id[
-            which(attributes$agricultural_areas_perc <= input$maxAgri)
-            ]
-          )
-        
-        # Select basins from maximum urban area 
-        selected <- intersect(
-          selected, attributes$gauge_id[
-            which(attributes$artificial_surfaces_perc <= input$maxUrban)
-            ]
-          )
-        
-        # Select basins from number of dams
-        selected <- intersect(
-          selected, 
-          attributes$gauge_id[which(attributes$dams_num <= input$maxNrDams)]
-        )
-        
-        # Select basins with sen's slope within a given range
-        selected <- intersect(
-          selected, hydro_indicator$gauge_id[
-            which(abs(hydro_indicator$q_annual_sens_slope) <= input$annualQTrend)
-            ]
-          )
-        
-        # Select basins with nitrate polluted area smaller than certain values
-        selected <- intersect(
-          selected, attributes$gauge_id[
-            which(attributes$nitrate_polluted_area_fraction <= 
-                    input$nirtatePollutedArea)
-            ]
-          )
-        
-        # Select basins with nitrate polluted area smaller than certain values
-        selected <- intersect(
-          selected, 
-          attributes$gauge_id[
-            which(attributes$protected_area_fraction >= input$protectedArea)
-          ]
-        )
-        
-        # Select basin with minimum protected area
-        selected <- intersect(
-          selected, 
-          attributes$gauge_id[which(
-            attributes$protected_area_fraction >= input$protectedArea
-          )]
-        )
-
-        # Select basin with population density within a certain range
-        intersect_id <- intersect(
-          which(attributes$popdens >= 1000*input$popDensity[1]),
-          which(attributes$popdens <= 1000*input$popDensity[2])
-          )
-        selected <- intersect(selected, attributes$gauge_id[intersect_id])
-        
-        # Select basin with minimum protected area
-        selected <- intersect(
-          selected, 
-          attributes$gauge_id[which(
-            attributes$wastewater_discharge_m3_year <= 
-              1000*input$maxWasteWaterDischarge
-          )]
-        )
+        selected_basins <<- Reduce(intersect, list(
+          selected$gauge_id,
+          
+          attributes %>% 
+            filter(agricultural_areas_perc <= input$maxAgri) %>% 
+            pull(gauge_id), 
+          
+          attributes %>% 
+            filter(artificial_surfaces_perc <= input$maxUrban) %>% 
+            pull(gauge_id),
+          
+          attributes %>% 
+            filter(dams_num <= input$maxNrDams) %>% 
+            pull(gauge_id),
+          
+          hydro_indicator %>% 
+            filter(abs(hydro_indicator$q_annual_sens_slope) <= input$annualQTrend) %>% 
+            pull(gauge_id),
+          
+          attributes %>% 
+            filter(nitrate_polluted_area_fraction <= input$nirtatePollutedArea) %>% 
+            pull(gauge_id),
+          
+          attributes %>% 
+            filter(protected_area_fraction >= input$protectedArea) %>% 
+            pull(gauge_id),
+          
+          attributes %>% 
+            filter(popdens >= 1000*input$popDensity[1]) %>% 
+            pull(gauge_id),
+          
+          attributes %>% 
+            filter(popdens <= 1000*input$popDensity[2]) %>%  
+            pull(gauge_id),
+          
+          attributes %>% 
+            filter(wastewater_discharge_m3_year <= 1000*input$maxWasteWaterDischarge) %>% 
+            pull(gauge_id)
+        ))
         
         # Update map of selected stations
-        showGauge(stations, selected)
+        showGauge(stations, selected_basins)
         
         # Update catchment attribute taböe
         output$catchment_attributes <- DT::renderDataTable({
-          showDataFrame(attributes, session, "catchment_attributes", selected)
+          showDataFrame(attributes, session, "catchment_attributes", 
+                        selected_basins)
         })
         
         # Update hydrological indicator talbe
         output$hydro_indicator <- DT::renderDataTable({
-          showDataFrame(hydro_indicator %>% filter(gauge_id %in% selected), 
+          showDataFrame(hydro_indicator %>% filter(gauge_id %in% selected_basins), 
                         session,  "hydro_indicator")
         })
         
-        # Assign to global variables so can be used later
-        selected_gauge_id <<- selected
       }
       
     }, ignoreInit = TRUE)
@@ -308,21 +277,19 @@ function(input, output, session) {
   #============================================================================#
   observeEvent(input$runRegression, {
     
-    # Setup and run multi-variable regression equation
-    dependent_var <- input$selectDepVar  
-    independent_var <- input$selectIndepVar 
-    
     # Get data for regression
     regression_df <- hydro_indicator %>% 
-      filter(gauge_id %in% selected_gauge_id) %>%
-      select(c(gauge_id, {{dependent_var}})) %>%
+      filter(gauge_id %in% selected_basins) %>%
+      select(c(gauge_id, {{input$selectDepVar}})) %>%
       right_join(attributes %>% 
-                   select(c(gauge_id, {{independent_var}})) %>%
-                   filter(gauge_id %in% selected_gauge_id),
+                   select(c(gauge_id, {{input$selectIndepVar}})) %>%
+                   filter(gauge_id %in% selected_basins),
                  by = "gauge_id") %>%
       drop_na()
       
-    model <<- multiLinearReg(regression_df, dependent_var, independent_var)
+    model <<- multiLinearReg(regression_df, 
+                             input$selectDepVar,    # Denpendent variables
+                             input$selectIndepVar)  # Independent variables
     
     output$regression_plot <- renderPlotly(
       subplot(model$plt, nrows = length(model$plt), 
@@ -387,9 +354,9 @@ function(input, output, session) {
         left_join(near_nat_states, by = "gauge_id")
       
       if (input$selectBasinGroup == "Near natural basins"){
-        show_gauge_id <- selected_gauge_id
+        show_gauge_id <- selected_basins
       } else if(input$selectBasinGroup == "Non near-natural basin") {
-        show_gauge_id <- setdiff(hydro_indicator$gauge_id, selected_gauge_id)
+        show_gauge_id <- setdiff(hydro_indicator$gauge_id, selected_basins)
       } else {
         show_gauge_id <- new_stations$gauge_id
       }
