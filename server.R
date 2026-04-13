@@ -8,7 +8,6 @@
 # 5. Other reactive functions                                                  #
 #==============================================================================#
 
-library(plotly)
 
 function(input, output, session) {
 
@@ -129,7 +128,7 @@ function(input, output, session) {
                                           show_col_types = FALSE)
     } else {
       streamflow_statistic <<- getStreamflowStatistics(
-        timeseries_camels_combine = timeseries_camels_combine_file,
+        timeseries_camels_combine = timeseries_camels,
         variable_name = c("discharge_spec_obs", "precipitation_mean"),
         start_date    = input$selectPeriod[1],
         end_date      = input$selectPeriod[2],
@@ -206,7 +205,7 @@ function(input, output, session) {
         #----------------------------------------------------------------------
         selected <- hydro_indicator
         
-        if (!"None" %in% selectFlowRegime){
+        if (!"None" %in% input$selectFlowRegime){
           for (condition in selectFlowRegime){
             colname <- strsplit(condition, " ")[[1]][1]
             selected <- selected %>% filter(!!sym(colname) > 1.1)

@@ -20,6 +20,7 @@ library(spsComps)
 library(ggplot2)
 library(patchwork)
 library(trend)
+library(plotly)
 
 # setwd("C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization")
 
@@ -28,7 +29,7 @@ hydro_indicator <- NULL
 near_nat_states <- NULL
 
 # Time series data
-timeseries_camels_combine_file <- "data/CAMELS_DE_hydromet_timeseries_combine.csv"
+timeseries_camels <- "data/CAMELS_DE_hydromet_timeseries_combine.csv"
 
 # Read catchment attributes, stations, catchments
 attributes  <- read_csv("data/attributes.csv", show_col_types = FALSE) 
