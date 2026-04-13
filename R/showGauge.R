@@ -30,7 +30,7 @@ showGauge <- function(stations_shape,
     
   } else {
     
-    color_values <- stations_shape[[colorby]] 
+    color_values <- abs(stations_shape[[colorby]]) 
     
     breaks <- quantile(color_values, probs = seq(0, 1, length.out = 6), 
                        na.rm = TRUE)

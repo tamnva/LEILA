@@ -184,7 +184,6 @@ function(input, output, session) {
                 selected = NA)
     }, ignoreNULL = FALSE)
   
-  
   #============================================================================#
   #                         2. Select near-natural catchments                  #
   #============================================================================#
@@ -274,26 +273,31 @@ function(input, output, session) {
   observeEvent(input$runRegression, {
     
     # Get data for regression
+    selectDepVar <- input$selectDepVar
+    selectIndepVar <- input$selectIndepVar
+    
     regression_df <- hydro_indicator %>% 
       filter(gauge_id %in% selected_basins) %>%
-      select(c(gauge_id, {{input$selectDepVar}})) %>%
+      select(c(gauge_id, {{selectDepVar}})) %>%
       right_join(attributes %>% 
-                   select(c(gauge_id, {{input$selectIndepVar}})) %>%
+                   select(c(gauge_id, {{selectIndepVar}})) %>%
                    filter(gauge_id %in% selected_basins),
                  by = "gauge_id") %>%
       drop_na()
-      
-    model <<- multiLinearReg(regression_df, 
-                             input$selectDepVar,    # Denpendent variables
-                             input$selectIndepVar)  # Independent variables
-    
+
+    model <<- reg_models(data = regression_df, 
+                  dependent_var = input$selectDepVar,    # Dependent variables
+                  independent_var = input$selectIndepVar,
+                  model_name = input$selectRegressionModel,
+                  n_train_samples = 80)  # Independent variables
+
     output$regression_plot <- renderPlotly(
       subplot(model$plt, nrows = length(model$plt), 
               titleX = TRUE, titleY = TRUE) %>%
         layout(height = 280*length(model$plt))
       )
     
-    # Cacluate near natural states for all others variables
+    # Calcuate near natural states for all others variables
     # Get the data frame of independent variables
     temp <- attributes %>% 
       filter(gauge_id %in% hydro_indicator$gauge_id) %>%

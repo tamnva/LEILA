@@ -21,6 +21,7 @@ library(ggplot2)
 library(patchwork)
 library(trend)
 library(plotly)
+library(randomForest)
 
 # setwd("C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization")
 
