@@ -240,11 +240,8 @@ function(input, output, session) {
             pull(gauge_id),
           
           attributes %>% 
-            filter(popdens >= 1000*input$popDensity[1]) %>% 
-            pull(gauge_id),
-          
-          attributes %>% 
-            filter(popdens <= 1000*input$popDensity[2]) %>%  
+            filter(popdens >= 1000*input$popDensity[1],
+                   popdens <= 1000*input$popDensity[2]) %>% 
             pull(gauge_id),
           
           attributes %>% 
