@@ -128,8 +128,7 @@ navbarPage(
               selectInput("selectRegressionModel", "1. Select regression model",
                           multiple = FALSE, 
                           choices = c("Multiple linear regression",
-                                      "Random forest",
-                                      "TabICLv2"),
+                                      "Random forest"),
                           selected = "Multiple linear regression"),
               
               selectInput("selectIndepVar", "2. Select independent variable(s)",
