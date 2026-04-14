@@ -182,7 +182,7 @@ function(input, output, session) {
     updateSelectInput(session, "visual_catchment_attr", "Select atribute",
                 choices = names(attributes)[sapply(attributes, is.numeric)],
                 selected = NA)
-    }, ignoreNULL = TRUE)
+    }, ignoreNULL = FALSE)
   
   #============================================================================#
   #                         2. Select near-natural catchments                  #
@@ -227,11 +227,13 @@ function(input, output, session) {
             pull(gauge_id),
           
           hydro_indicator %>% 
-            filter(abs(hydro_indicator$q_annual_sens_slope) <= input$annualQTrend) %>% 
+            filter(abs(hydro_indicator$q_annual_sens_slope) <= 
+                     input$annualQTrend) %>% 
             pull(gauge_id),
           
           attributes %>% 
-            filter(nitrate_polluted_area_fraction <= input$nirtatePollutedArea) %>% 
+            filter(nitrate_polluted_area_fraction <= 
+                     input$nirtatePollutedArea) %>% 
             pull(gauge_id),
           
           attributes %>% 
@@ -244,14 +246,16 @@ function(input, output, session) {
             pull(gauge_id),
           
           attributes %>% 
-            filter(wastewater_discharge_m3_year <= 10^6*input$maxWasteWaterDischarge) %>% 
+            filter(wastewater_discharge_m3_year <= 
+                     10^6*input$maxWasteWaterDischarge) %>% 
             pull(gauge_id)
         ))
         
-        if (length(selected_basins) < 10){
+        if (length(selected_basins) < 5){
           message("lengh = ", length(selected_basins))
-          showNotification("Please relax the conditions and select some basins", 
-                           type = "warning")}
+          showNotification(paste0("Please relax the conditions to allow ",
+                                  "some basins to be selected"),
+                           type = "error")}
         
         # Update map of selected stations
         showGauge(stations, selected_basins)

@@ -17,10 +17,10 @@ showGauge <- function(stations_shape,
   # Update map
   if (is.na(colorby)){
     leafletProxy("map") %>%
-      clearGroup("Abflussmessstelle") %>%
+      clearGroup("Streamgauge") %>%
       addCircleMarkers(data = stations_shape,
                        radius = 3,
-                       group = "Abflussmessstelle",
+                       group = "Streamgauge",
                        fillColor = "#FFC107",
                        fillOpacity = 0.8,
                        stroke = FALSE,
@@ -38,10 +38,10 @@ showGauge <- function(stations_shape,
     pal <- colorBin(palette = "viridis", domain = color_values, bin = breaks)
     
     leafletProxy("map") %>%
-      clearGroup("Abflussmessstelle") %>%
+      clearGroup("Streamgauge") %>%
       addCircleMarkers(data = stations_shape,
                        radius = 3,
-                       group = "Abflussmessstelle",
+                       group = "Streamgauge",
                        fillColor = pal(color_values),
                        stroke = FALSE,
                        fillOpacity = 0.8,
