@@ -78,7 +78,7 @@ navbarPage(
                            min = 0.001, max = 0.1, value = 0.1, width = "85%"),
               
               numericInput("maxWasteWaterDischarge", 
-                           "Maximum wastewater discharge (1000 m³/year)",
+                           "Maximum wastewater discharge (10⁶ m³/year)",
                            min = 0, max = 10^6, value = 10^6, width = "85%"),
               
               h5(tags$b("2. Resilience to climate change")),
@@ -116,7 +116,7 @@ navbarPage(
               h5(tags$b("3. Social aspect")),
               sliderInput("popDensity", 
                           "Select polution density (1000 person/km²)", 
-                          min = 0, max = 3, value = c(0, 3), step = 0.05),
+                          min = 0, max = 1, value = c(0, 1), step = 0.1),
               
             ),
             

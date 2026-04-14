@@ -182,7 +182,7 @@ function(input, output, session) {
     updateSelectInput(session, "visual_catchment_attr", "Select atribute",
                 choices = names(attributes)[sapply(attributes, is.numeric)],
                 selected = NA)
-    }, ignoreNULL = FALSE)
+    }, ignoreNULL = TRUE)
   
   #============================================================================#
   #                         2. Select near-natural catchments                  #
@@ -239,14 +239,19 @@ function(input, output, session) {
             pull(gauge_id),
           
           attributes %>% 
-            filter(popdens >= 1000*input$popDensity[1],
-                   popdens <= 1000*input$popDensity[2]) %>% 
+            filter(popdens >= 10^3*input$popDensity[1],
+                   popdens <= 10^3*input$popDensity[2]) %>% 
             pull(gauge_id),
           
           attributes %>% 
-            filter(wastewater_discharge_m3_year <= 1000*input$maxWasteWaterDischarge) %>% 
+            filter(wastewater_discharge_m3_year <= 10^6*input$maxWasteWaterDischarge) %>% 
             pull(gauge_id)
         ))
+        
+        if (length(selected_basins) < 10){
+          message("lengh = ", length(selected_basins))
+          showNotification("Please relax the conditions and select some basins", 
+                           type = "warning")}
         
         # Update map of selected stations
         showGauge(stations, selected_basins)
