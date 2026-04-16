@@ -210,14 +210,8 @@ navbarPage(
   ),
   
   tabPanel(
-    "Catchment attribute",
+    "Catchment attribute & Hydrological indicator",
     hr(),
     DT::dataTableOutput("catchment_attributes")
-  ),
-  
-  tabPanel(
-    "Hydrological indicator",
-    hr(),
-    DT::dataTableOutput("hydro_indicator")
   )
 )

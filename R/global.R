@@ -25,23 +25,17 @@ library(randomForest)
 
 # setwd("C:/Users/nguyenta/Documents/LEILA/working_code_documentation/code/leila_visualization")
 
-# Initialize some variales
-hydro_indicator <- NULL
-near_nat_states <- NULL
-
 # Time series data
 timeseries_camels <- "data/CAMELS_DE_hydromet_timeseries_combine.csv"
 
-# Read catchment attributes, stations, catchments
-attributes  <- read_csv("data/attributes.csv", show_col_types = FALSE) 
-stations    <- st_read("data/CAMELS_DE_gauging_stations.shp", quiet = TRUE)
-catchments  <- st_read("data/CAMELS_DE_catchments.shp", quiet = TRUE)
+# Read catchment attributes and hydrological indicators, stations, catchments
+att_hydro  <- read_csv("data/attributes_and_hydrological_indicator.csv") 
+stations    <- st_read("data/CAMELS_DE_gauging_stations.shp")
+catchments  <- st_read("data/CAMELS_DE_catchments.shp")
 
 # Schutzgebiete, Nitratbelastete Gebiete, Hydrogeologische Einheiten
-schutzgetbiet           <- st_transform(st_read("data/schutzgebiet", 
-                                                quiet = TRUE), 4326)
-nitratbelastete_gebiete <- st_read("data/Nitratbelastete_Gebiete.shp", 
-                                   quiet = TRUE)
+schutzgetbiet           <- st_transform(st_read("data/schutzgebiet"), 4326)
+nitratbelastete_gebiete <- st_read("data/Nitratbelastete_Gebiete.shp")
 huek                    <- rast("data/huek.tif")
 population_density      <- rast("data/population_density.tif")
 
@@ -54,7 +48,6 @@ gw_wells <- read.csv("data/gw_meta_monthly_geo_qc.txt",
 gw_wells <- st_as_sf(gw_wells, coords = c("x_EPSG25832", "y_EPSG25832"), 
                      crs = 25832, remove = FALSE)
 gw_wells <- st_transform(gw_wells, 4326)
-
 
 # Read abwassermenge
 waste_water_discharge <- st_read("data/abwassermenge.geojson", quiet = TRUE)

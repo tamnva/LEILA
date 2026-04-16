@@ -13,7 +13,7 @@
 # Show a popup at the given location
 showPopup <- function(gauge_id) {
   
-  selectedCat <- attributes[attributes$gauge_id == gauge_id[1],]
+  selectedCat <- att_hydro[att_hydro$gauge_id == gauge_id[1],]
 
   content <- as.character(tagList(
     tags$h5("Gauge ID:", selectedCat$gauge_id),

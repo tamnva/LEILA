@@ -29,7 +29,7 @@ function(input, output, session) {
       addRasterImage(population_density,
                      opacity = 0.7, 
                      group = "Population density (people/km²)")  %>%
-      addPolygons(data = subset(catchments),
+      addPolygons(data = catchments,
                   stroke = TRUE,
                   fillColor = "#00000000",
                   color = "#C4C4C4",
@@ -108,25 +108,16 @@ function(input, output, session) {
       setView(lng = 9, lat = 50, zoom = 5)
   })
   
-  output$catchment_attributes <- DT::renderDataTable({
-    showDataFrame(attributes, session, "catchment_attributes", NULL)
-  })
-  
   #============================================================================#
   #    1. Select catchment based on streamflow data availability (Data)        #
   #============================================================================#
   observeEvent(input$dataSubset, {
-
-    attributes <<- read_csv("data/attributes.csv", show_col_types = FALSE)
     
     # Replace the default hydrological indicators if settings are changed
-    if ((input$selectPeriod[1] == as.Date("1990-01-01") &
+    if (!(input$selectPeriod[1] == as.Date("1990-01-01") &
          input$selectPeriod[2] == as.Date("2020-12-31") &
          input$maxQmissing == 10)){
       
-      hydro_indicator <<- readr::read_csv("data/hydro_indicator.csv",
-                                          show_col_types = FALSE)
-    } else {
       streamflow_statistic <<- getStreamflowStatistics(
         timeseries_camels_combine = timeseries_camels,
         variable_name = c("discharge_spec_obs", "precipitation_mean"),
@@ -135,53 +126,28 @@ function(input, output, session) {
         max_missing   = input$maxQmissing) %>%
         mutate(across(where(is.numeric), function(x) round(x, 3)))
       
-      # Add lat, long to streamflow statistics to know location of stations
-      hydro_indicator <<-  attributes %>% 
+      # Update streamflow statistics in attributes
+      att_hydro <<- read_csv("data/attributes_and_hydrological_indicator.csv") %>%
         filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
-        select(lat, long, gauge_id) %>% 
-        left_join(streamflow_statistic, by = "gauge_id")
-      
-      # data.table::fwrite(hydro_indicator, "data/hydro_indicator.csv")
+        rows_update(streamflow_statistic, by = "gauge_id")
+    } else {
+      att_hydro <<- att_hydro %>% drop_na(q_mean)
     }
-    
-    # Precipitation statistics should be in the attributes table
-    attributes <<- attributes %>% 
-      left_join(hydro_indicator %>% select(p_mean, p_std, gauge_id), 
-                by = "gauge_id")
-    
-    hydro_indicator <<- hydro_indicator %>% 
-      select(!c(p_mean, p_std)) 
     
     # Update the catchment attributes table
     output$catchment_attributes <- DT::renderDataTable({
-      showDataFrame(attributes, session, "catchment_attributes", 
-                    hydro_indicator$gauge_id)})
-    
-    # Update the hydrological indicator table
-    output$hydro_indicator <- DT::renderDataTable({hydro_indicator})
+      showDataFrame(att_hydro, session, "catchment_attributes", 
+                    att_hydro$gauge_id)})
     
     # Update map
-    showGauge(stations, hydro_indicator$gauge_id)
+    showGauge(stations, att_hydro$gauge_id)
     
-    # Update regression select dependent variables
-    if (!is.null(hydro_indicator)){
-      updateSelectInput(session, "selectDepVar", 
-                        choices = colnames(
-                          hydro_indicator %>% select(!c(lat, long, gauge_id))
-                          ))
-    }
-    
-    # Update list of independent variables for regression
-    updateSelectInput(session, "selectIndepVar", 
-                      "2. Select independent variable(s)",
-                      choices = colnames(
-                        attributes %>% select(!c(gauge_id))
-                        ))
-    
-    # Update visualize variables
-    updateSelectInput(session, "visual_catchment_attr", "Select atribute",
-                choices = names(attributes)[sapply(attributes, is.numeric)],
-                selected = NA)
+    # Update regression select dependent and independent variables
+    column_names <- colnames(att_hydro %>% select(!c(lat, long, gauge_id)))
+    updateSelectInput(session, "selectDepVar", choices = column_names)
+    updateSelectInput(session, "selectIndepVar", choices = column_names)
+    updateSelectInput(session, "visual_catchment_attr",choices = column_names)
+
     }, ignoreNULL = FALSE)
   
   #============================================================================#
@@ -198,81 +164,69 @@ function(input, output, session) {
       input$popDensity,
       input$maxWasteWaterDischarge), 
     {
+    
+      selected <- att_hydro
       
-      if (!is.null(hydro_indicator)){
-
-        #----------------------------------------------------------------------
-        selected <- hydro_indicator
+      if (!"None" %in% input$selectFlowRegime){
+        for (condition in selectFlowRegime){
+          colname <- strsplit(condition, " ")[[1]][1]
+          selected <- selected %>% filter(!!sym(colname) > 1.1)
+        }
+      } 
+      
+      selected_basins <<- Reduce(intersect, list(
+        selected$gauge_id,
         
-        if (!"None" %in% input$selectFlowRegime){
-          for (condition in selectFlowRegime){
-            colname <- strsplit(condition, " ")[[1]][1]
-            selected <- selected %>% filter(!!sym(colname) > 1.1)
-          }
-        } 
+        att_hydro %>% 
+          filter(agricultural_areas_perc <= input$maxAgri) %>% 
+          pull(gauge_id), 
         
-        selected_basins <<- Reduce(intersect, list(
-          selected$gauge_id,
-          
-          attributes %>% 
-            filter(agricultural_areas_perc <= input$maxAgri) %>% 
-            pull(gauge_id), 
-          
-          attributes %>% 
-            filter(artificial_surfaces_perc <= input$maxUrban) %>% 
-            pull(gauge_id),
-          
-          attributes %>% 
-            filter(dams_num <= input$maxNrDams) %>% 
-            pull(gauge_id),
-          
-          hydro_indicator %>% 
-            filter(abs(hydro_indicator$q_annual_sens_slope) <= 
-                     input$annualQTrend) %>% 
-            pull(gauge_id),
-          
-          attributes %>% 
-            filter(nitrate_polluted_area_fraction <= 
-                     input$nirtatePollutedArea) %>% 
-            pull(gauge_id),
-          
-          attributes %>% 
-            filter(protected_area_fraction >= input$protectedArea) %>% 
-            pull(gauge_id),
-          
-          attributes %>% 
-            filter(popdens >= 10^3*input$popDensity[1],
-                   popdens <= 10^3*input$popDensity[2]) %>% 
-            pull(gauge_id),
-          
-          attributes %>% 
-            filter(wastewater_discharge_m3_year <= 
-                     10^6*input$maxWasteWaterDischarge) %>% 
-            pull(gauge_id)
-        ))
+        att_hydro %>% 
+          filter(artificial_surfaces_perc <= input$maxUrban) %>% 
+          pull(gauge_id),
         
-        if (length(selected_basins) < 5){
-          message("lengh = ", length(selected_basins))
-          showNotification(paste0("Please relax the conditions to allow ",
-                                  "some basins to be selected"),
-                           type = "error")}
+        att_hydro %>% 
+          filter(dams_num <= input$maxNrDams) %>% 
+          pull(gauge_id),
         
-        # Update map of selected stations
-        showGauge(stations, selected_basins)
+        att_hydro %>% 
+          filter(abs(att_hydro$q_annual_sens_slope) <= 
+                   input$annualQTrend) %>% 
+          pull(gauge_id),
         
-        # Update catchment attribute taböe
-        output$catchment_attributes <- DT::renderDataTable({
-          showDataFrame(attributes, session, "catchment_attributes", 
-                        selected_basins)
-        })
+        att_hydro %>% 
+          filter(nitrate_polluted_area_fraction <= 
+                   input$nirtatePollutedArea) %>% 
+          pull(gauge_id),
         
-        # Update hydrological indicator talbe
-        output$hydro_indicator <- DT::renderDataTable({
-          showDataFrame(hydro_indicator %>% filter(gauge_id %in% selected_basins), 
-                        session,  "hydro_indicator")
-        })
+        att_hydro %>% 
+          filter(protected_area_fraction >= input$protectedArea) %>% 
+          pull(gauge_id),
         
-      }
+        att_hydro %>% 
+          filter(popdens >= 10^3*input$popDensity[1],
+                 popdens <= 10^3*input$popDensity[2]) %>% 
+          pull(gauge_id),
+        
+        att_hydro %>% 
+          filter(wastewater_discharge_m3_year <= 
+                   10^6*input$maxWasteWaterDischarge) %>% 
+          pull(gauge_id)
+      ))
+      
+      if (length(selected_basins) < 5){
+        message("lengh = ", length(selected_basins))
+        showNotification(paste0("Please relax the conditions to allow ",
+                                "some basins to be selected"),
+                         type = "error")}
+      
+      # Update map of selected stations
+      showGauge(stations, selected_basins)
+      
+      # Update catchment attribute taböe
+      output$catchment_attributes <- DT::renderDataTable({
+        showDataFrame(att_hydro,session, "catchment_attributes",selected_basins)
+      })
       
     }, ignoreInit = TRUE)
   
@@ -282,23 +236,18 @@ function(input, output, session) {
   observeEvent(input$runRegression, {
     
     # Get data for regression
-    selectDepVar <- input$selectDepVar
-    selectIndepVar <- input$selectIndepVar
+    selectDepVarIndepVar <- c(input$selectDepVar, input$selectIndepVar)
     
-    regression_df <- hydro_indicator %>% 
+    regression_df <- att_hydro %>% 
       filter(gauge_id %in% selected_basins) %>%
-      select(c(gauge_id, {{selectDepVar}})) %>%
-      right_join(attributes %>% 
-                   select(c(gauge_id, {{selectIndepVar}})) %>%
-                   filter(gauge_id %in% selected_basins),
-                 by = "gauge_id") %>%
+      select(c(gauge_id, {{selectDepVarIndepVar}})) %>%
       drop_na()
 
     model <<- reg_models(data = regression_df, 
-                  dependent_var = input$selectDepVar,    # Dependent variables
+                  dependent_var = input$selectDepVar,
                   independent_var = input$selectIndepVar,
                   model_name = input$selectRegressionModel,
-                  n_train_samples = 80)  # Independent variables
+                  n_train_samples = 80)  
 
     output$regression_plot <- renderPlotly(
       subplot(model$plt, nrows = length(model$plt), 
@@ -306,32 +255,18 @@ function(input, output, session) {
         layout(height = 280*length(model$plt))
       )
     
-    # Calcuate near natural states for all others variables
-    # Get the data frame of independent variables
-    temp <- attributes %>% 
-      filter(gauge_id %in% hydro_indicator$gauge_id) %>%
-      select(c(gauge_id, input$selectIndepVar))
-    
-    # Get the near natural state using regression equation
+    # Calculate near natural states for all others variables
     for (var in input$selectDepVar){
-      temp[[paste0(var, "_near_nat")]] <- predict(model[[var]], temp)
+      att_hydro[[paste0(var, "_near_nat")]] <<- predict(model[[var]], att_hydro)
     }
-    
-    # Combine with current state
-    temp <- temp %>%
-      left_join(hydro_indicator %>% select(c(gauge_id, input$selectDepVar)),
-                by = "gauge_id")
-    
+
     # Calculate the differences between near natural and current states
     for (var in input$selectDepVar){
-      temp <- temp %>%
+      att_hydro <<- att_hydro %>%
         mutate(!!paste0(var, "_diff") :=  100*
                  (!!sym(var) - !!sym(paste0(var, "_near_nat")))/
                  (!!sym(paste0(var, "_near_nat"))))
     }
-    
-    # Assign back to global variable to use later
-    near_nat_states <<- temp
     
     # Update select distance to near natural state for visualization
     choices <- paste0(input$selectDepVar, "_near_nat")
@@ -351,45 +286,34 @@ function(input, output, session) {
                       selected = NA)
   }, ignoreInit = TRUE)
   
-  
   #============================================================================#
   #                               4. Visualization                             #
   #============================================================================#
   observeEvent(input$visual_selected_var, {
-  
-    if (!is.null(near_nat_states)){
-      new_stations <- stations %>% 
-        filter(gauge_id %in% hydro_indicator$gauge_id) %>%
-        left_join(near_nat_states, by = "gauge_id")
-      
-      if (input$selectBasinGroup == "Near natural basins"){
-        show_gauge_id <- selected_basins
-      } else if(input$selectBasinGroup == "Non near-natural basin") {
-        show_gauge_id <- setdiff(hydro_indicator$gauge_id, selected_basins)
-      } else {
-        show_gauge_id <- new_stations$gauge_id
-      }
+
+    if (input$selectBasinGroup == "Near natural basins"){
+      show_gauge_id <- selected_basins
+    } else if(input$selectBasinGroup == "Non near-natural basin") {
+      show_gauge_id <- setdiff(att_hydro$gauge_id, selected_basins)
+    } else {
+      show_gauge_id <- att_hydro$gauge_id
     }
-        
+      
+  
+    data.table::fwrite(att_hydro, "tam.csv")
+    att_hydro <- data.table::fread("tam.csv")
+    
     # Get variables name
-    if (!is.null(near_nat_states) & 
-        input$visualType == "Distance to neat-natural states"){
+    if (input$visualType == "Distance to neat-natural states"){
       
       variable <- paste0(gsub("_near_nat", "", 
                               input$visual_distance_to_near_nat), "_diff")
       
-      shinyCatch(showGauge(new_stations, show_gauge_id, colorby = variable),
-                 blocking_level = "error")
-      
-      # Update hydrological indicator talbe
       shinyCatch(
-        output$hydro_indicator <- DT::renderDataTable({
-          showDataFrame(
-            st_drop_geometry(new_stations) %>% 
-              mutate(across(where(is.numeric), function(x) round(x, 2))),
-            session,  "hydro_indicator")
-        }),
+        showGauge(st_as_sf(att_hydro, coords = c("long", "lat"), crs = 4326), 
+                  show_gauge_id, colorby = variable),
         blocking_level = "error")
+      
     } else {
       
       message("Cannot visualize")
@@ -435,6 +359,18 @@ function(input, output, session) {
             group = "Gewägktes Einzugsgebiet",
             layerId = ~ gauge_id)}
     }
+  }, ignoreInit = TRUE)
+  
+  
+  #----------------------------------------------------------------------------# 
+  #                 Update select dependent variables                          #
+  #----------------------------------------------------------------------------# 
+  observeEvent(input$selectIndepVar, {
+    column_names <- colnames(att_hydro %>% select(
+      !c(lat, long, gauge_id, input$selectIndepVar)))
+    
+    updateSelectInput(session, "selectDepVar", 
+                      choices = column_names)
   }, ignoreInit = TRUE)
   
 }

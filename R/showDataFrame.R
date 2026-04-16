@@ -12,14 +12,14 @@
 #'
 #' @export
 #' 
-showDataFrame <- function(catchment_attributes, session, 
+showDataFrame <- function(att_hydro, session, 
                           outputId, select_gauge_id=NULL){
   
   if (!is.null(select_gauge_id)) {
-    dataFrame <- catchment_attributes %>% 
-      filter(gauge_id %in% select_gauge_id)
+    dataFrame <- att_hydro %>% 
+      dplyr::filter(gauge_id %in% select_gauge_id)
   } else {
-    dataFrame <- catchment_attributes
+    dataFrame <- att_hydro
   }
   
   dataFrame <- dataFrame %>%
