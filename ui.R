@@ -1,5 +1,4 @@
-library(leaflet)
-library(plotly)
+
 
 navbarPage(
   "", id="nav",
@@ -79,7 +78,7 @@ navbarPage(
               
               numericInput("maxWasteWaterDischarge", 
                            "Maximum wastewater discharge (10⁶ m³/year)",
-                           min = 0, max = 10^6, value = 10^6, width = "85%"),
+                           min = 0, max = 10^3, value = 10^6, width = "85%"),
               
               h5(tags$b("2. Resilience to climate change")),
               selectInput("selectFlowRegime", "Select flow regime",

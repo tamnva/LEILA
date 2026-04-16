@@ -4,7 +4,6 @@
 #                          Read all base data                                  #
 # The sources of these data are described in the README.txt file (same folder) #
 #------------------------------------------------------------------------------#
-
 library(leaflet)
 library(spsComps)
 library(plotly)
