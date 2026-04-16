@@ -9,7 +9,7 @@
 #'
 #' @export
 
-reg_models <- function(data,                 # data for training and testing
+reg_models <- function(data,          # data for training and testing
                 dependent_var,        # names of dependent variables
                 independent_var,      # name independent variables
                 model_name="Multiple linear regression",    # model name 
@@ -61,13 +61,18 @@ reg_models <- function(data,                 # data for training and testing
   #----------------------------------------------------------------------------#
   # Plot results
   for (var in dependent_var){
+    target_test <- data_test[[var]]
+    predict_test <- predict(models[[var]], data_test)
+  
+    target_train <- data_train[[var]]
+    predict_train <- predict(models[[var]], data_train)
+    
+
     models$plt[[var]] <- ggplotly(
       ggplot() + 
-        geom_point(aes(x =  data_test[[var]], 
-                       y = predict(models[[var]], data_test)), 
+        geom_point(aes(x =  target_test, y = predict_test), 
                    color = "#1E88E5", alpha = 0.7, size = 1) +
-        geom_point(aes(x =  data_train[[var]], 
-                       y = predict(models[[var]], data_train)), 
+        geom_point(aes(x =  target_train, y = predict_train), 
                    color = "#D81B60", alpha = 0.7, size = 1) +
         scale_color_discrete(name = "Model performance") +
         labs(x = "Target", y = "Predicted", title = var) +

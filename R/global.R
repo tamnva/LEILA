@@ -29,18 +29,20 @@ library(randomForest)
 timeseries_camels <- "data/CAMELS_DE_hydromet_timeseries_combine.csv"
 
 # Read catchment attributes and hydrological indicators, stations, catchments
-att_hydro  <- read_csv("data/attributes_and_hydrological_indicator.csv") 
+att_hydro  <- read_csv("data/attributes_and_hydrological_indicator.csv", 
+                       show_col_types = FALSE) 
 stations    <- st_read("data/CAMELS_DE_gauging_stations.shp")
 catchments  <- st_read("data/CAMELS_DE_catchments.shp")
 
 # Schutzgebiete, Nitratbelastete Gebiete, Hydrogeologische Einheiten
-schutzgetbiet           <- st_transform(st_read("data/schutzgebiet"), 4326)
+schutzgetbiet <- st_transform(st_read("data/schutzgebiet"), 4326)
 nitratbelastete_gebiete <- st_read("data/Nitratbelastete_Gebiete.shp")
-huek                    <- rast("data/huek.tif")
-population_density      <- rast("data/population_density.tif")
+huek <- rast("data/huek.tif")
+population_density <- rast("data/population_density.tif")
 
 # Read groundwater wells
-selected_wells <- read.csv("data/selected_well_per_catchment_unique.csv")
+selected_wells <- read_csv("data/selected_well_per_catchment_unique.csv", 
+                           show_col_types = FALSE)
 gw_wells <- read.csv("data/gw_meta_monthly_geo_qc.txt", 
                      sep = ";", header = TRUE) %>% as_tibble() %>%
   filter(UFZ.ID %in% selected_wells$well_id)

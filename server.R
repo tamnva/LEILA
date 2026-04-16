@@ -127,7 +127,8 @@ function(input, output, session) {
         mutate(across(where(is.numeric), function(x) round(x, 3)))
       
       # Update streamflow statistics in attributes
-      att_hydro <<- read_csv("data/attributes_and_hydrological_indicator.csv") %>%
+      att_hydro <<- read_csv("data/attributes_and_hydrological_indicator.csv", 
+                             show_col_types = FALSE) %>%
         filter(gauge_id %in% streamflow_statistic$gauge_id) %>%
         rows_update(streamflow_statistic, by = "gauge_id")
     } else {
