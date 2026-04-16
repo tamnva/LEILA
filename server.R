@@ -1,11 +1,11 @@
 #==============================================================================#
 #               The procedure of this R script is as follows:                  #
-# 0. Load background maps and defaults values                                  #
-# 1. Select catchment based on streamflow data availability (Data)             #
-# 2. Select near-natural catchments                                            #
-# 3. Regression (linking hydro. indicators with catchment attributes)          #
-# 4. Visualization                                                             #
-# 5. Other reactive functions                                                  #
+# 1. Load background maps and defaults values                                  #
+# 2. Select catchment based on streamflow data availability (Data)             #
+# 3. Select near-natural catchments                                            #
+# 4. Regression (linking hydro. indicators with catchment attributes)          #
+# 5. Visualization                                                             #
+# 6. Other reactive functions                                                  #
 #==============================================================================#
 
 
@@ -17,7 +17,7 @@ function(input, output, session) {
   })
   
   #============================================================================#
-  #               0. Background + default maps/tables                          #
+  #               1. Background + default maps/tables                          #
   #============================================================================#
   output$map <- renderLeaflet({
     leaflet() %>%
@@ -109,7 +109,7 @@ function(input, output, session) {
   })
   
   #============================================================================#
-  #    1. Select catchment based on streamflow data availability (Data)        #
+  #    2. Select catchment based on streamflow data availability (Data)        #
   #============================================================================#
   observeEvent(input$dataSubset, {
     
@@ -152,7 +152,7 @@ function(input, output, session) {
     }, ignoreNULL = FALSE)
   
   #============================================================================#
-  #                         2. Select near-natural catchments                  #
+  #                         3. Select near-natural catchments                  #
   #============================================================================#
   observeEvent(
     c(input$selectFlowRegime,
@@ -232,7 +232,7 @@ function(input, output, session) {
     }, ignoreInit = TRUE)
   
   #============================================================================#
-  #      3. Regression (linking hydro. indicators with catchment attributes)   #
+  #      4. Regression (linking hydro. indicators with catchment attributes)   #
   #============================================================================#
   observeEvent(input$runRegression, {
     
@@ -277,9 +277,9 @@ function(input, output, session) {
     
   }, ignoreInit = TRUE)
 
-  #----------------------------------------------------------------------------#
-  #        Differences between current states and target indicators            #
-  #----------------------------------------------------------------------------#  
+  #----------------------------------------------------------------------------# 
+  #         Differences between current states and target indicators           #
+  #----------------------------------------------------------------------------# 
   observeEvent(input$selectDepVar, {
     updateSelectInput(session, "visual_distance_to_near_nat", 
                       "1. Visualize distance to",
@@ -288,7 +288,7 @@ function(input, output, session) {
   }, ignoreInit = TRUE)
   
   #============================================================================#
-  #                               4. Visualization                             #
+  #                               5. Visualization                             #
   #============================================================================#
   observeEvent(input$visual_selected_var, {
 
@@ -299,10 +299,6 @@ function(input, output, session) {
     } else {
       show_gauge_id <- att_hydro$gauge_id
     }
-      
-  
-    data.table::fwrite(att_hydro, "tam.csv")
-    att_hydro <- data.table::fread("tam.csv")
     
     # Get variables name
     if (input$visualType == "Distance to neat-natural states"){
@@ -323,7 +319,7 @@ function(input, output, session) {
     }, ignoreInit = TRUE)
    
   #============================================================================#
-  #                     5. Other reactive functions                            #
+  #                     6. Other reactive functions                            #
   #============================================================================#
   
   #----------------------------------------------------------------------------# 
