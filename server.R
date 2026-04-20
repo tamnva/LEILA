@@ -236,6 +236,12 @@ function(input, output, session) {
   #============================================================================#
   observeEvent(input$runRegression, {
     
+    # Update select distance to near natural state for visualization
+    choices <- paste0(input$selectDepVar, "_near_nat")
+    updateSelectInput(session, "visual_distance_to_near_nat", "Distance to ",
+                      choices = choices,
+                      selected = choices[1])
+    
     # Get data for regression
     selectDepVarIndepVar <- c(input$selectDepVar, input$selectIndepVar)
     
@@ -244,37 +250,34 @@ function(input, output, session) {
       select(c(gauge_id, {{selectDepVarIndepVar}})) %>%
       drop_na()
 
-    model <<- reg_models(data = regression_df, 
-                  dependent_var = input$selectDepVar,
-                  independent_var = input$selectIndepVar,
-                  model_name = input$selectRegressionModel,
-                  n_train_samples = 80)  
-
-    output$regression_plot <- renderPlotly(
-      subplot(model$plt, nrows = length(model$plt), 
-              titleX = TRUE, titleY = TRUE) %>%
-        layout(height = 280*length(model$plt))
+    shinyCatch({
+      model <<- reg_models(data = regression_df, 
+                           dependent_var = input$selectDepVar,
+                           independent_var = input$selectIndepVar,
+                           model_name = input$selectRegressionModel,
+                           n_train_samples = 80)
+      
+      output$regression_plot <- renderPlotly(
+        subplot(model$plt, nrows = length(model$plt), 
+                titleX = TRUE, titleY = TRUE) %>%
+          layout(height = 280*length(model$plt))
       )
-    
-    # Calculate near natural states for all others variables
-    for (var in input$selectDepVar){
-      att_hydro[[paste0(var, "_near_nat")]] <<- predict(model[[var]], att_hydro)
-    }
-
-    # Calculate the differences between near natural and current states
-    for (var in input$selectDepVar){
-      att_hydro <<- att_hydro %>%
-        mutate(!!paste0(var, "_diff") :=  100*
-                 (!!sym(var) - !!sym(paste0(var, "_near_nat")))/
-                 (!!sym(paste0(var, "_near_nat"))))
-    }
-    
-    # Update select distance to near natural state for visualization
-    choices <- paste0(input$selectDepVar, "_near_nat")
-    updateSelectInput(session, "visual_distance_to_near_nat", "Distance to ",
-                      choices = choices,
-                      selected = choices[1])
-    
+      
+      # Calculate near natural states for all others variables
+      for (var in input$selectDepVar){
+        att_hydro[[paste0(var, "_near_nat")]] <<- predict(model[[var]], 
+                                                          att_hydro)
+      }
+      
+      # Calculate the differences between near natural and current states
+      for (var in input$selectDepVar){
+        att_hydro <<- att_hydro %>%
+          mutate(!!paste0(var, "_diff") :=  100*
+                   (!!sym(var) - !!sym(paste0(var, "_near_nat")))/
+                   (!!sym(paste0(var, "_near_nat"))))
+      }
+    }, blocking_level = "error")
+      
   }, ignoreInit = TRUE)
 
   #----------------------------------------------------------------------------# 
