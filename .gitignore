@@ -1,5 +1,5 @@
 # History files
-*.csv
+#*.csv
 .Rhistory
 .Rapp.history
 
@@ -49,3 +49,4 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 /data/hgw
+data/CAMELS_DE_hydromet_timeseries_combine.csv
