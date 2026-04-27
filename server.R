@@ -263,14 +263,10 @@ function(input, output, session) {
           layout(height = 280*length(model$plt))
       )
       
-      # Calculate near natural states for all others variables
+      # Calculate dif between near natural states and current states
       for (var in input$selectDepVar){
         att_hydro[[paste0(var, "_near_nat")]] <<- predict(model[[var]], 
                                                           att_hydro)
-      }
-      
-      # Calculate the differences between near natural and current states
-      for (var in input$selectDepVar){
         att_hydro <<- att_hydro %>%
           mutate(!!paste0(var, "_diff") :=  100*
                    (!!sym(var) - !!sym(paste0(var, "_near_nat")))/
@@ -306,7 +302,7 @@ function(input, output, session) {
     # Get variables name
     if (input$visualType == "Distance to neat-natural states"){
       
-      variable <- paste0(gsub("_near_nat", "", 
+      variable <- paste0(gsub("_near_nat", "",
                               input$visual_distance_to_near_nat), "_diff")
       
       shinyCatch(
