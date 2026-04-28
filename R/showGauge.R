@@ -42,7 +42,9 @@ showGauge <- function(stations_shape,
                        fillColor = pal(color_values),
                        stroke = FALSE,
                        fillOpacity = 0.8,
-                       layerId = ~ gauge_id
+                       layerId = ~ gauge_id,
+                       popup = ~paste0("Distance to target = ",
+                                       round(color_values,0), "%")
       ) %>%
       clearControls() %>%
       addLegend(
