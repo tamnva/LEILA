@@ -2,18 +2,18 @@
 #'
 #' @param stations_shape polygon object; GIS map of gauges
 #' @param select_gauge_id vector; selected station ids
-#' 
+#'
 #' @return leaflet map of selected gauging stations
 #'
 #' @export
 
-showGauge <- function(stations_shape, 
-                      select_gauge_id, 
+showGauge <- function(stations_shape,
+                      select_gauge_id,
                       colorby = NA){
-  
-  stations_shape <- stations_shape %>% 
+
+  stations_shape <- stations_shape %>%
     dplyr::filter(gauge_id %in% select_gauge_id)
-  
+
   # Update map
   if (is.na(colorby)){
     leafletProxy("map") %>%
@@ -27,16 +27,13 @@ showGauge <- function(stations_shape,
                        layerId = ~ gauge_id
       ) %>%
       clearControls()
-    
+
   } else {
-    
-    color_values <- abs(stations_shape[[colorby]]) 
-    
-    breaks <- quantile(color_values, probs = seq(0, 1, length.out = 6), 
-                       na.rm = TRUE)
-    
-    pal <- colorBin(palette = "viridis", domain = color_values, bin = breaks)
-    
+
+    color_values <- as.vector(stations_shape[[colorby]])
+    breaks <-  c(-Inf, -100, -75, -50, -25, 25, 50, 75, 100, Inf)
+    pal <- colorBin(palette = "PiYG", domain = color_values, bin = breaks)
+
     leafletProxy("map") %>%
       clearGroup("Streamgauge") %>%
       addCircleMarkers(data = stations_shape,
@@ -55,6 +52,6 @@ showGauge <- function(stations_shape,
         title = "Distance to near nat. (%)",
         opacity = 1,
         labFormat = labelFormat(digits = 0)
-      ) 
+      )
   }
 }
